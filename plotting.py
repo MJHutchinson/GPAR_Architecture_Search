@@ -75,7 +75,7 @@ def plot_iteration(iteration, x_tested, y_tested, x_remaining, y_remaining, rema
             y_lim = axes.get_ylim()
 
             for x_n in x_next[inds_next]:
-                plt.plot([x_n[1], x_n[1]], y_lim, c=cs[j], label='New point(s) to try')
+                plt.plot([x_n[1], x_n[1]], y_lim, c=cs[j], label='New point to try')
 
             axes.set_ylim(y_lim)
 
@@ -84,8 +84,7 @@ def plot_iteration(iteration, x_tested, y_tested, x_remaining, y_remaining, rema
 
     plt.tight_layout()
     plt.subplots_adjust(top=0.85)
-    plt.savefig(fig_dir + f'/iteration_{iteration}' + '.png', format='png')
-    plt.savefig(fig_dir + f'/iteration_{iteration}' + '.svg', format='svg')
+    plotting_config.savefig(fig_dir + f'/iteration_{iteration}')
 
 
     fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True, figsize=(10, 10))
@@ -123,7 +122,7 @@ def plot_iteration(iteration, x_tested, y_tested, x_remaining, y_remaining, rema
         y_lim = ax1.get_ylim()
 
         for x_n in x_next[inds_next]:
-            ax1.plot([x_n[1], x_n[1]], y_lim, c=cs[j], label='New point(s) to try')
+            ax1.plot([x_n[1], x_n[1]], y_lim, c=cs[j], label='New point to try')
 
         ax1.set_ylim(y_lim)
 
@@ -136,12 +135,11 @@ def plot_iteration(iteration, x_tested, y_tested, x_remaining, y_remaining, rema
         inds_next = x_next[:, 0] == j + min_layers
 
         for x_n, r_n in zip(x_next[inds_next], acquisition_next[inds_next]):
-            ax2.scatter(x_n[1], r_n, c=cs_remaining[j], label='New point(s) to try')
+            ax2.scatter(x_n[1], r_n, c=cs_remaining[j], label='New point to try')
 
     plt.tight_layout()
     plt.legend()
-    plt.savefig(fig_dir + f'/iteration_{iteration}_expected_improv' + '.png', format='png')
-    plt.savefig(fig_dir + f'/iteration_{iteration}_expected_improv' + '.svg', format='svg')
+    plotting_config.savefig(fig_dir + f'/iteration_{iteration}_expected_improv')
     plt.close('all')
 
 def plot_search_results(aquisitions, f_bests, fig_dir):
@@ -153,6 +151,6 @@ def plot_search_results(aquisitions, f_bests, fig_dir):
     plt.xlabel('Points evaluated')
     plt.ylabel('Maximum function value')
 
-    plt.savefig(fig_dir + '/search_results' + '.png', format='png')
-    plt.savefig(fig_dir + '/search_results' + '.svg', format='svg')
+    plotting_config.savefig(fig_dir + '/search_results')
+
     plt.close('all')

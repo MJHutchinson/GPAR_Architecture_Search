@@ -4,7 +4,7 @@ source venv/bin/activate
 
 DATADIR="data"
 OUTDIR="output"
-datasets=("power-plant")
+datasets=("power-plant" "bostonHousing" "concrete" "energy" "kin8nm")
 acquisitions=("EI" "PI" "SD")
 seeds=("0" "1" "2" "3" "4" "5")
 experiment="weight_pruning_hyperprior3"
@@ -17,6 +17,7 @@ for ds in "${datasets[@]}"; do
 
         for acquisition in "${acquisitions[@]}"; do
             python dummy_search.py --data "$ds" --experiment "$experiment" --seed "$seed" --acquisition "$acquisition" --final --datadir "$DATADIR" --outdir "$OUTDIR"
+            python dummy_search.py --data "$ds" --experiment "$experiment" --seed "$seed" --acquisition "$acquisition" --datadir "$DATADIR" --outdir "$OUTDIR"
         done
     done
 done

@@ -42,11 +42,11 @@ parser.add_argument('--outdir', type=str, help='Directory to get output from',
 
 args = parser.parse_args()
 
-outdir = os.path.join(args.outdir, args.experiment, args.data) #f'/home/mjhutchinson/Documents/MachineLearning/gpar/output/searches/{args.experiment}/{args.data}'
+outdir = os.path.join(args.outdir, 'searches', args.experiment, args.data) #f'/home/mjhutchinson/Documents/MachineLearning/gpar/output/searches/{args.experiment}/{args.data}'
 
 dirs = os.listdir(outdir)
 
-configs = [pickle.load(open(outdir + dir + '/config.pkl', 'rb')) for dir in dirs]
+configs = [pickle.load(open(os.path.join(outdir, dir, 'config.pkl'), 'rb')) for dir in dirs]
 
 def match(file_args):
     if not args.experiment == file_args.experiment:
@@ -61,7 +61,7 @@ def match(file_args):
 
 configs = [config for config in configs if match(config)]
 
-experiments = [Experiment(config, pickle.load(open(config.outdir + 'results.pkl', 'rb'))) for config in configs]
+experiments = [Experiment(config, pickle.load(open(os.path.join(config.outdir, 'results.pkl'), 'rb'))) for config in configs]
 
 experiment_types = defaultdict(list)
 
@@ -103,4 +103,5 @@ for idx, key in enumerate(experiment_types.keys()):
 
 
 plt.legend()
+plotting_config.savefig(outdir + '/search_results')
 plt.show()
