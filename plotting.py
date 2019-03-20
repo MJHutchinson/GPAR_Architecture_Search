@@ -22,8 +22,8 @@ def plot_iteration(iteration, x_tested, y_tested, x_remaining, y_remaining, rema
     min_layers = int(min(min(x_remaining[:, 0]), min(x_tested[:, 0])))
     max_layers = int(max(max(x_remaining[:, 0]), max(x_tested[:, 0])))
 
-    cs = ['tab:red', 'tab:blue', 'tab:green']
-    cs_remaining = ['tab:pink', 'tab:cyan', 'tab:olive']
+    cs = ['xkcd:red', 'xkcd:blue', 'xkcd:green', 'xkcd:purple', 'xkcd:orange']
+    cs_remaining = ['xkcd:pink', 'xkcd:sky blue', 'xkcd:light green', 'xkcd:lavender', 'xkcd:peach']
 
     outputs = int(y_tested.shape[1])
     if outputs < 5:

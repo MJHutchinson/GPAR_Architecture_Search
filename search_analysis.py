@@ -42,11 +42,11 @@ parser.add_argument('--outdir', type=str, help='Directory to get output from',
 
 args = parser.parse_args()
 
-outdir = os.path.join(args.outdir, 'searches', args.experiment, args.data) #f'/home/mjhutchinson/Documents/MachineLearning/gpar/output/searches/{args.experiment}/{args.data}'
+print(args)
 
-dirs = os.listdir(outdir)
+outdir = os.path.join(args.outdir, 'searches', args.experiment, args.data, args.version) #f'/home/mjhutchinson/Documents/MachineLearning/gpar/output/searches/{args.experiment}/{args.data}'
 
-configs = [pickle.load(open(os.path.join(outdir, dir, 'config.pkl'), 'rb')) for dir in dirs]
+dirs = [dir for dir in os.listdir(outdir) if os.path.isdir(os.path.join(outdir, dir))]
 
 def match(file_args):
     if not args.experiment == file_args.experiment:
@@ -59,9 +59,10 @@ def match(file_args):
         return False
     return True
 
-configs = [config for config in configs if match(config)]
+dirs = [dir for dir in dirs if match(pickle.load(open(os.path.join(outdir, dir, 'config.pkl'), 'rb')))]
 
-experiments = [Experiment(config, pickle.load(open(os.path.join(config.outdir, 'results.pkl'), 'rb'))) for config in configs]
+
+experiments = [Experiment(pickle.load(open(os.path.join(outdir, dir, 'config.pkl'), 'rb')), pickle.load(open(os.path.join(outdir, dir, 'results.pkl'), 'rb'))) for dir in dirs]
 
 experiment_types = defaultdict(list)
 
@@ -70,8 +71,8 @@ for experiment in experiments:
 
 colors = ['tab:blue', 'tab:orange', 'tab:green', 'tab:red', 'tab:purple', 'tab:brown', 'tab:pink', 'tab:gray', 'tab:olive', 'tab:cyan']
 
-plt.figure(figsize=plotting_config.full_width_square)
-plt.title(f'Search methods on {args.data} comparison \n Searching for optimal {"RMSE" if args.rmse else "Log Likelihood"}')
+fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True, figsize=plotting_config.full_width_square)
+plt.suptitle(f'Search methods on {args.data} comparison \n Searching for optimal {"RMSE" if args.rmse else "Log Likelihood"}')
 
 for idx, key in enumerate(experiment_types.keys()):
     results = experiment_types[key]
@@ -80,13 +81,22 @@ for idx, key in enumerate(experiment_types.keys()):
         iterations = np.zeros([len(results[0]), len(results)])
         for i in range(len(results[0])):
             for j in range(len(results)):
-                iteration_results[i, j] = np.squeeze(results[j][i].y_best)
-                iterations[i, j] = np.size(results[j][i].y_tested)
+                iteration_result = np.squeeze(results[j][i].y_best)
+                if len(iteration_result.shape) == 2:
+                    iteration_results[i, j] = iteration_result[:, -1]
+                elif len(iteration_result.shape) == 1:
+                    iteration_results[i, j] = iteration_result[-1]
+                else:
+                    iteration_results[i, j] = iteration_result
 
-        print(iterations, iteration_results)
+                iterations[i, j] = results[j][i].y_tested.shape[0]
+
+        # print(iterations, iteration_results)
 
         # This meaning does not work if the results come at different numbers of points acquired for this search type
-        plt.plot(iterations[:, 0], np.mean(iteration_results, axis=1), c=colors[idx], label=f'{key[0]} {"final only" if key[1] else "all"}')
+        ax1.plot(iterations[:, 0], np.mean(iteration_results, axis=1), c=colors[idx], label=f'{key[0]} {"final only" if key[1] else "all"}')
+        ax2.plot(iterations[:, 0], np.std(iteration_results, axis=1), c=colors[idx], label=f'{key[0]} {"final only" if key[1] else "all"}')
+
         # plt.fill_between(iterations[:, 0], np.min(iteration_results, axis=1), np.max(iteration_results, axis=1), color=colors[idx], alpha=0.3)
 
         # plt.plot(iterations[:, 0], np.min(iteration_results, axis=1), c=colors[idx], linestyle='dashed')
@@ -94,14 +104,14 @@ for idx, key in enumerate(experiment_types.keys()):
 
         # plt.plot(iterations[:, 0], np.mean(iteration_results, axis=1) + np.std(iteration_results, axis=1), c=colors[idx], linestyle='dashed')
         # plt.plot(iterations[:, 0], np.mean(iteration_results, axis=1) - np.std(iteration_results, axis=1), c=colors[idx], linestyle='dashed')
-
-        plt.fill_between(iterations[:, 0],
-                         np.mean(iteration_results, axis=1) + np.std(iteration_results, axis=1),
-                         np.mean(iteration_results, axis=1) - np.std(iteration_results, axis=1),
-                         color=colors[idx], alpha=0.2)
+        #
+        # plt.fill_between(iterations[:, 0],
+        #                  np.mean(iteration_results, axis=1) + np.std(iteration_results, axis=1),
+        #                  np.mean(iteration_results, axis=1) - np.std(iteration_results, axis=1),
+        #                  color=colors[idx], alpha=0.2)
 
 
 
 plt.legend()
 plotting_config.savefig(outdir + '/search_results')
-plt.show()
+plt.close()

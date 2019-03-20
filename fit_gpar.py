@@ -1,4 +1,5 @@
 import os
+import pickle
 import argparse
 
 import matplotlib.pyplot as plt
@@ -9,8 +10,6 @@ from scipy.stats import norm
 from gpar.regression import GPARRegressor
 
 B.epsilon = 1e-6  # Set regularisation a bit higher to ensure robustness.
-data_dir = '/home/mjhutchinson/Documents/MachineLearning/gpar/data/'  # The data is located here.
-
 
 def transform_x(x):
     return np.stack((x[:, 0], np.log10(x[:, 1])), axis=0).T
@@ -30,13 +29,18 @@ parser.add_argument('-q', '--quick', action='store_true',
                     help='quick test on the first three outputs')
 parser.add_argument('--rmse', action='store_true',
                     help='predict the RMSE instead')
+parser.add_argument('--final', action='store_true',
+                    help='fit using only the final observations')
+parser.add_argument('--valid', action='store_true',
+                    help='split data in half to create a validation set')
 parser.add_argument('--joint', action='store_true',
                     help='also train jointly')
 args = parser.parse_args()
 
 print(args)
 
-fig_dir = f'/home/mjhutchinson/Documents/MachineLearning/gpar/output/{args.experiment}/'
+data_dir = '/home/mjhutchinson/Documents/MachineLearning/architecture_search_gpar/data/'  # The data is located here.
+fig_dir = f'/home/mjhutchinson/Documents/MachineLearning/architecture_search_gpar/output/fits/{args.experiment}/'
 os.makedirs(fig_dir, exist_ok=True)
 
 # Load data.
@@ -51,14 +55,20 @@ y = np.genfromtxt('{}/{}/'
                   '{}/f_{}.txt'
                   ''.format(*formatting_args))
 
-def gen_dataset(x, y):
-    # inds = x[:, 1].argsort(axis=0)
-    # x, y = x[inds], y[inds]
-    # inds = x[:, 0].argsort(axis=0, kind='mergesort')
-    # x, y = x[inds], y[inds]
-    #
-    # return x[::2, :],y[::2, :],x[1::2, :],y[1::2, :]
-    return x,y,x[1:2,:],y[1:2,:]
+if args.final:
+    y = (y[:, -1])[:, np.newaxis]
+
+if args.valid:
+    def gen_dataset(x, y):
+        inds = x[:, 1].argsort(axis=0)
+        x, y = x[inds], y[inds]
+        inds = x[:, 0].argsort(axis=0, kind='mergesort')
+        x, y = x[inds], y[inds]
+
+        return x[::2, :],y[::2, :],x[1::2, :],y[1::2, :]
+else:
+    def gen_dataset(x, y):
+        return x,y,None,None
 
 
 x, y, x_valid, y_valid = gen_dataset(x, y)
@@ -140,20 +150,23 @@ preds = [(sample.mean(axis=0),
 
 
 # Compute metrics of training
+if x_valid is not None:
+    print('Predicting validation points')
+    samples = unnormalise(model.sample(transform_x(x_valid),
+                                num_samples=50,
+                                latent=True,
+                                posterior=True))
 
-print('Predicting validation points')
-samples = unnormalise(model.sample(transform_x(x_valid),
-                            num_samples=50,
-                            latent=True,
-                            posterior=True))
 
+    means = np.mean(samples, axis=0)[:, -1]
+    stds = np.std(samples, axis=0)[:, -1]
+    _y = y_valid[:, -1]
 
-means = np.mean(samples, axis=0)[:, -1]
-stds = np.std(samples, axis=0)[:, -1]
-_y = y_valid[:, -1]
-
-valid_rmse = np.mean((_y - means) ** 2) ** 0.5
-valid_mean_loglik = np.mean(norm.logpdf(_y, loc=means, scale=stds))
+    valid_rmse = np.mean((_y - means) ** 2) ** 0.5
+    valid_mean_loglik = np.mean(norm.logpdf(_y, loc=means, scale=stds))
+else:
+    valid_rmse = 0
+    valid_mean_loglik = 0
 
 print('Predicting training points')
 samples = unnormalise(model.sample(transform_x(x),
@@ -164,7 +177,7 @@ samples = unnormalise(model.sample(transform_x(x),
 
 means = np.mean(samples, axis=0)[:, -1]
 stds = np.std(samples, axis=0)[:, -1]
-_y = y_valid[:, -1]
+_y = y[:, -1]
 
 train_rmse = np.mean((_y - means) ** 2) ** 0.5
 train_mean_loglik = np.mean(norm.logpdf(_y, loc=means, scale=stds))
@@ -197,7 +210,7 @@ for i in range(y.shape[1]):
         #             label='Train points ({} layers)'.format(j), c=c_valid, zorder=9)
 
 
-fig_path = fig_dir + args.data + '-' + ('rmse' if args.rmse else 'loglik')
+fig_path = os.path.join(fig_dir, f'{args.data}-{"rmse" if args.rmse else "loglik"}-{"final" if args.final else "all"}-{"valid" if args.valid else "novalid"}')
 plt.tight_layout()
 plt.legend()
 plt.subplots_adjust(top=0.85)
@@ -206,3 +219,18 @@ plt.savefig(fig_path + '.svg', format='svg')
 
 # plt.show()
 plt.close()
+
+if ~os.path.isfile(os.path.join(fig_dir, 'results.pkl')):
+    train_loglik_store = {}
+    valid_loglik_store = {}
+    train_rmse_store = {}
+    valid_rmse_store = {}
+else:
+    (train_loglik_store, valid_loglik_store, train_rmse_store, valid_rmse_store) = pickle.load(open(os.path.join(fig_dir, 'results.pkl'), 'rb'))
+
+train_loglik_store[(args.data, args.rmse, args.final, args.valid)] = train_mean_loglik
+valid_loglik_store[(args.data, args.rmse, args.final, args.valid)] = valid_mean_loglik
+train_rmse_store[(args.data, args.rmse, args.final, args.valid)] = train_rmse
+valid_rmse_store[(args.data, args.rmse, args.final, args.valid)] = valid_rmse
+
+pickle.dump((train_loglik_store, valid_loglik_store, train_rmse_store, valid_rmse_store), open(os.path.join(fig_dir, 'results.pkl'), 'wb'))

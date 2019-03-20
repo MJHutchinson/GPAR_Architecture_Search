@@ -6,6 +6,7 @@ import datetime
 import argparse
 from collections import namedtuple
 
+import torch
 import numpy as np
 from stheno import B
 
@@ -28,7 +29,7 @@ from gpar.regression import GPARRegressor
 
 B.epsilon = 1e-6  # Set regularisation a bit higher to ensure robustness.
 trace = False  # if to print out optimisation trace
-version = '0.1.0' # current version of the algorithm
+version = '0.2.0' # current version of the algorithm
 np.random.seed(0) # fix random seed
 
 parser = argparse.ArgumentParser()
@@ -58,6 +59,9 @@ parser.add_argument('--rmse', action='store_true',
 parser.add_argument('--final', action='store_true',
                     help='Use a GP over the final test points only')
 
+parser.add_argument('--force', action='store_true',
+                    help='Force redo experiment')
+
 parser.add_argument('--joint', action='store_true',
                     help='also train jointly')
 
@@ -72,13 +76,21 @@ parser.add_argument('-t', '--thompson_samples',
 parser.add_argument('-s', '--seed', type=int, default=0,
                     help='Random seed to use for the search')
 
-parser.add_argument('-m', '--max_iters', type=int, default=10,
+parser.add_argument('-fs', '--function_seed', type=int, default=0,
+                    help='Random seed to use for the synthetic function')
+
+parser.add_argument('-m', '--max_evals', type=int, default=45,
                     help='Iterations to run the search for, accounting for thompson samples')
 
-parser.add_argument('--datadir', type=str, help='Directory the data is located in',
+parser.add_argument('--noise', type=float, default=0.01,
+                    help='noise to model on the synthetic function, if the synthetic function is used')
+
+parser.add_argument('--datadir', type=str,
+                    help='Directory the data is located in',
                     default='data/')
 
-parser.add_argument('--outdir', type=str, help='Directory to put output in',
+parser.add_argument('--outdir', type=str,
+                    help='Directory to put output in',
                     default='output')
 
 args = parser.parse_args()
@@ -110,32 +122,58 @@ if args.random and not args.final:
     print("Cannot have random search with multiple outputs")
     sys.exit(0)
 
-np.random.seed(args.seed)
-
 # Define location of data and output directories
 data_dir = args.datadir #'/home/mjhutchinson/Documents/MachineLearning/architecture_search_gpar/data/'
-
-# Load data.
-x = np.genfromtxt(os.path.join(data_dir, args.data, args.experiment, f'x_{"rmse" if args.rmse else "loglik"}.txt'))
-y = np.genfromtxt(os.path.join(data_dir, args.data, args.experiment, f'f_{"rmse" if args.rmse else "loglik"}.txt'))
-
-if args.final:
-    y = y[:, -1][:, np.newaxis]
-
-outdir = os.path.join(args.outdir, 'searches', args.experiment, args.data,
-                      f'{"rmse" if args.rmse else "loglik"}-{"random" if args.random else args.acquisition}-{"final" if args.final else "all"}-{args.seed}-{version}')
-args.outdir = outdir
-
-# check if exists and make folder
-if os.path.isdir(outdir):
-    print('Experiment already run. Exiting')
-    sys.exit(0)
-
-os.makedirs(outdir)
 
 # Define the transformation to apply to the x data
 def transform_x(x):
     return np.stack((x[:, 0], np.log10(x[:, 1])), axis=0).T
+
+
+if args.data == 'synthetic':
+    np.random.seed(args.function_seed)
+    torch.manual_seed(args.function_seed)
+    args.experiment = 'synthetic'
+    x1 = np.linspace(1, 5, 5)
+    x2 = np.concatenate([np.linspace(1, 10, 10), np.linspace(15, 100, 18)])
+    xx1, xx2 = np.meshgrid(x1, x2)
+    x = np.stack([np.ravel(xx1), np.ravel(xx2)], axis=1)
+
+    model = GPARRegressor(scale=[2., .5], scale_tie=True,
+                          linear=True, linear_scale=10., linear_with_inputs=False,
+                          nonlinear=False, nonlinear_with_inputs=False,
+                          markov=1,
+                          replace=True,
+                          noise=args.noise)
+
+    n = 10
+
+    y = model.sample(transform_x(x), p=n, latent=False)
+
+else:
+    # Load data.
+    x = np.genfromtxt(os.path.join(data_dir, args.data, args.experiment, f'x_{"rmse" if args.rmse else "loglik"}.txt'))
+    y = np.genfromtxt(os.path.join(data_dir, args.data, args.experiment, f'f_{"rmse" if args.rmse else "loglik"}.txt'))
+
+np.random.seed(args.seed)
+torch.manual_seed(args.seed)
+
+if args.final:
+    y = y[:, -1][:, np.newaxis]
+
+outdir = os.path.join(args.outdir, 'searches', args.experiment, args.data, version,
+                      f'{"rmse" if args.rmse else "loglik"}-{"random" if args.random else args.acquisition}-{"final" if args.final else "all"}-{args.seed}')
+args.outdir = outdir
+
+# check if exists and make folder
+if os.path.isdir(outdir):
+    if args.force:
+        shutil.rmtree(outdir)
+    else:
+        print('Experiment already run. Exiting')
+        sys.exit(0)
+
+os.makedirs(outdir)
 
 # Find min and max layers in the data
 min_layers = int(min(x[:, 0]))
@@ -216,7 +254,7 @@ while y_tested is None or len(y_tested) < args.initial_points:
 iteration = 1
 # Iterate the search procedure. TODO: Figure better termination conditions
 if not args.random:
-    while iteration <= args.max_iters:
+    while y_tested.shape[0] <= args.max_evals:
         # Define the GPAR model for this iteration. TODO: reuse hyper parameters from previous run as a starting point?
         print(f'Running iteration {iteration}')
         model = GPARRegressor(scale=[1., .5], scale_tie=True,
@@ -265,9 +303,22 @@ if not args.random:
         # r_delta = r_mean - y_best
 
         if args.random:
-            remaining_acquisition= np.ones(remaining_stats[0][:, -1].shape)
+            remaining_acquisition = np.ones(remaining_stats[0][:, -1].shape)
             next_index = np.random.choice(np.arange(len(remaining_stats[0])), args.thompson_samples, replace=False)
         else:
+            # next_index = []
+            # for i in range(args.thompson_samples):
+            #     samples_per_select = 5
+            #     if remaining_samples.shape[0] < args.thompson_samples * samples_per_select: raise ValueError('Not enough samples to compute all points')
+            #     sample_subset = remaining_samples[i*samples_per_select:(i+1)*samples_per_select, :]
+            #     remaining_acquisition = acquisition_function(sample_subset, y_best)
+            #     sorted_index = list(np.squeeze(remaining_acquisition).argsort(axis=0))
+            #     next = sorted_index.pop()
+            #     while next in next_index:
+            #         next = sorted_index.pop()
+            #     next_index.append(next)
+            #
+            # next_index = np.array(next_index)
             remaining_acquisition = acquisition_function(remaining_samples, y_best)
             remaining_acquisition = remaining_acquisition[:, -1]
             # Select the top next indices to try
@@ -278,6 +329,7 @@ if not args.random:
         y_next = y_remaining[next_index]
         acquisition_next = remaining_acquisition[next_index]
 
+        print('\t Plotting results')
         # Plot the next points in a nice format and save
         plotting.plot_iteration(iteration,
                                 x_tested, unnormalise(y_tested),
