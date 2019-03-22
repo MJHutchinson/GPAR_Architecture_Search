@@ -85,6 +85,7 @@ def plot_iteration(iteration, x_tested, y_tested, x_remaining, y_remaining, rema
     plt.tight_layout()
     plt.subplots_adjust(top=0.85)
     plotting_config.savefig(fig_dir + f'/iteration_{iteration}')
+    plt.close('all')
 
 
     fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True, figsize=(10, 10))

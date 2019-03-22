@@ -254,7 +254,7 @@ while y_tested is None or len(y_tested) < args.initial_points:
 iteration = 1
 # Iterate the search procedure. TODO: Figure better termination conditions
 if not args.random:
-    while y_tested.shape[0] <= args.max_evals:
+    while y_tested.shape[0] < args.max_evals:
         # Define the GPAR model for this iteration. TODO: reuse hyper parameters from previous run as a starting point?
         print(f'Running iteration {iteration}')
         model = GPARRegressor(scale=[1., .5], scale_tie=True,
@@ -364,7 +364,7 @@ if not args.random:
         iteration += 1
 
 else:
-    while iteration < args.thompson_samples * args.max_iters:
+    while y_tested.shape[0] < args.max_evals:
         print(f'Running iteration {iteration}')
         random_ind = np.random.choice(np.arange(len(x_remaining)), 1)
 
