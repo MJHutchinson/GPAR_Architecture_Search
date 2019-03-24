@@ -4,8 +4,7 @@ source venv/bin/activate
 
 DATADIR="data"
 OUTDIR="output"
-#datasets=("power-plant" "bostonHousing" "concrete" "energy" "kin8nm")
-datasets=("synthetic")
+datasets=("power-plant" "bostonHousing" "concrete" "energy" "kin8nm")
 acquisitions=("EI" "PI" "SD")
 seeds=("0" "1" "2" "3" "4" "5")
 function_seed=9

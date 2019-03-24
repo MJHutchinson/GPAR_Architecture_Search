@@ -29,7 +29,7 @@ from gpar.regression import GPARRegressor
 
 B.epsilon = 1e-6  # Set regularisation a bit higher to ensure robustness.
 trace = False  # if to print out optimisation trace
-version = '0.2.0' # current version of the algorithm
+version = '0.2.1' # current version of the algorithm
 np.random.seed(0) # fix random seed
 
 parser = argparse.ArgumentParser()
@@ -134,12 +134,13 @@ if args.data == 'synthetic':
     np.random.seed(args.function_seed)
     torch.manual_seed(args.function_seed)
     args.experiment = 'synthetic'
+
     x1 = np.linspace(1, 5, 5)
-    x2 = np.concatenate([np.linspace(1, 10, 10), np.linspace(15, 100, 18)])
+    x2 = np.concatenate([np.linspace(1, 9, 9), np.linspace(10, 98, 45), np.linspace(100, 980, 45)])
     xx1, xx2 = np.meshgrid(x1, x2)
     x = np.stack([np.ravel(xx1), np.ravel(xx2)], axis=1)
 
-    model = GPARRegressor(scale=[2., .5], scale_tie=True,
+    model = GPARRegressor(scale=[2., .3], scale_tie=True,
                           linear=True, linear_scale=10., linear_with_inputs=False,
                           nonlinear=False, nonlinear_with_inputs=False,
                           markov=1,

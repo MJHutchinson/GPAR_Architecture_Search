@@ -10,7 +10,7 @@ datasets=("synthetic")
 #experiment="weight_pruning_hyperprior3"
 experiment="synthetic"
 #initial_random_point=3
-version=0.2.0
+version=0.2.1
 
 for ds in "${datasets[@]}"; do
     python search_analysis.py --experiment "$experiment" --data "$ds" -v "$version"

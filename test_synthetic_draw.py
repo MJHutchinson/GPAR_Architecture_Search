@@ -27,15 +27,15 @@ print(args)
 np.random.seed(args.seed)
 torch.manual_seed(args.seed)
 
-x1 = np.linspace(1,5,5)
-x2 = np.concatenate([np.linspace(1, 10, 10), np.linspace(15,100,18)])
-xx1, xx2 = np.meshgrid(x1, x2)
-x = np.stack([np.ravel(xx1), np.ravel(xx2)], axis=1)
-
 def transform_x(x):
     return np.stack((x[:, 0], np.log10(x[:, 1])), axis=0).T
 
-model = GPARRegressor(scale=[2., .5], scale_tie=True,
+x1 = np.linspace(1,5,5)
+x2 = np.concatenate([np.linspace(1, 9, 9), np.linspace(10,98,45), np.linspace(100,980,45)])
+xx1, xx2 = np.meshgrid(x1, x2)
+x = np.stack([np.ravel(xx1), np.ravel(xx2)], axis=1)
+
+model = GPARRegressor(scale=[2., .3], scale_tie=True,
                               linear=True, linear_scale=10., linear_with_inputs=False,
                               nonlinear=False, nonlinear_with_inputs=False,
                               markov=1,
