@@ -6,6 +6,7 @@ import datetime
 import argparse
 from collections import namedtuple
 
+import yaml
 import torch
 import numpy as np
 from stheno import B
@@ -29,7 +30,7 @@ from gpar.regression import GPARRegressor
 
 B.epsilon = 1e-6  # Set regularisation a bit higher to ensure robustness.
 trace = False  # if to print out optimisation trace
-version = '0.2.1' # current version of the algorithm
+version = '0.2.2' # current version of the algorithm
 np.random.seed(0) # fix random seed
 
 parser = argparse.ArgumentParser()
@@ -73,6 +74,9 @@ parser.add_argument('-t', '--thompson_samples',
                     default=4, type=int,
                     help='Number of points to sample per iteration')
 
+parser.add_argument('-ts', '--samples_per_thompson', defualt=0, type=int,
+                    help='Number of samples to use per thompson sample for acquisition, if 0, use all 50')
+
 parser.add_argument('-s', '--seed', type=int, default=0,
                     help='Random seed to use for the search')
 
@@ -92,6 +96,8 @@ parser.add_argument('--datadir', type=str,
 parser.add_argument('--outdir', type=str,
                     help='Directory to put output in',
                     default='output')
+
+parser.add_argument('--name', type=str, required=True, help='Name to give the experiment')
 
 args = parser.parse_args()
 
@@ -162,7 +168,9 @@ torch.manual_seed(args.seed)
 if args.final:
     y = y[:, -1][:, np.newaxis]
 
-outdir = os.path.join(args.outdir, 'searches', args.experiment, args.data, version,
+num_function_samples = max(50, args.thompson_samples * args.samples_per_thompson)
+
+outdir = os.path.join(args.outdir, 'searches', args.experiment, args.data, args.name,
                       f'{"rmse" if args.rmse else "loglik"}-{"random" if args.random else args.acquisition}-{"final" if args.final else "all"}-{args.seed}')
 args.outdir = outdir
 
@@ -275,7 +283,7 @@ if not args.random:
         # Sample the test points to allow us to plot the form of the GPAR function
         print('\t Predicting test points')
         test_samples = unnormalise(model.sample(transform_x(x_test),
-                                                num_samples=50,
+                                                num_samples=num_function_samples,
                                                 latent=True,
                                                 posterior=True))
 
@@ -288,7 +296,7 @@ if not args.random:
         # Sample the points remaining in the dataset - in reality this would be Thompson sampling of the network space
         print('\t Predicting remaining points')
         remaining_samples = unnormalise(model.sample(transform_x(x_remaining),
-                                                     num_samples=50,
+                                                     num_samples=num_function_samples,
                                                      latent=True,
                                                      posterior=True))
 
@@ -307,23 +315,31 @@ if not args.random:
             remaining_acquisition = np.ones(remaining_stats[0][:, -1].shape)
             next_index = np.random.choice(np.arange(len(remaining_stats[0])), args.thompson_samples, replace=False)
         else:
-            # next_index = []
-            # for i in range(args.thompson_samples):
-            #     samples_per_select = 5
-            #     if remaining_samples.shape[0] < args.thompson_samples * samples_per_select: raise ValueError('Not enough samples to compute all points')
-            #     sample_subset = remaining_samples[i*samples_per_select:(i+1)*samples_per_select, :]
-            #     remaining_acquisition = acquisition_function(sample_subset, y_best)
-            #     sorted_index = list(np.squeeze(remaining_acquisition).argsort(axis=0))
-            #     next = sorted_index.pop()
-            #     while next in next_index:
-            #         next = sorted_index.pop()
-            #     next_index.append(next)
-            #
-            # next_index = np.array(next_index)
-            remaining_acquisition = acquisition_function(remaining_samples, y_best)
-            remaining_acquisition = remaining_acquisition[:, -1]
-            # Select the top next indices to try
-            next_index = np.argpartition(remaining_acquisition, len(remaining_acquisition) - args.thompson_samples)[-args.thompson_samples:]
+            if args.samples_per_thompson:
+                # list to store values in
+                next_index = []
+                # loop for number of samples we want
+                for i in range(args.thompson_samples):
+                    # Error check number of samples
+                    if remaining_samples.shape[0] < args.thompson_samples * args.samples_per_thompson: raise ValueError('Not enough samples to compute all points')
+                    # Select subset of full smaple space
+                    sample_subset = remaining_samples[i*args.samples_per_thompson:(i+1)*args.samples_per_thompson, :]
+                    # Compute acquisition on the subset
+                    remaining_acquisition = acquisition_function(sample_subset, y_best)
+                    # Sort the acquisitions and get the indicies
+                    sorted_index = list(np.squeeze(remaining_acquisition).argsort(axis=0))
+                    # Try to add to the next index until a valid next is added
+                    next = sorted_index.pop()
+                    while next in next_index:
+                        next = sorted_index.pop()
+                    next_index.append(next)
+
+                next_index = np.array(next_index)
+            else:
+                remaining_acquisition = acquisition_function(remaining_samples, y_best)
+                remaining_acquisition = remaining_acquisition[:, -1]
+                # Select the top next indices to try
+                next_index = np.argpartition(remaining_acquisition, len(remaining_acquisition) - args.thompson_samples)[-args.thompson_samples:]
 
         # Select the next points to try
         x_next = x_remaining[next_index]
@@ -398,4 +414,5 @@ acquired = np.squeeze([len(result.x_tested) for result in iteration_results])
 plotting.plot_search_results(acquired, f_bests, outdir)
 
 pickle.dump(args, open(os.path.join(outdir, 'config.pkl'), 'wb'))
+yaml.dump(args, open(os.path.join(outdir, 'config.yaml'), 'wb'))
 pickle.dump(iteration_results, open(os.path.join(outdir, 'results.pkl'), 'wb'))

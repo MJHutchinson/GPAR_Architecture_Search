@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 source venv/bin/activate
 
-#DATADIR="data"
-#OUTDIR="output"
+. sys.config
+
 #datasets=("power-plant" "bostonHousing" "concrete" "energy" "kin8nm")
 datasets=("synthetic")
 #acquisitions=("EI" "PI" "SD")
@@ -13,5 +13,5 @@ experiment="synthetic"
 version=0.2.1
 
 for ds in "${datasets[@]}"; do
-    python search_analysis.py --experiment "$experiment" --data "$ds" -v "$version"
+    python search_analysis.py --experiment "$experiment" --data "$ds" -v "$version" --outdir "$OUTDIR"
 done

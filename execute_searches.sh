@@ -2,8 +2,8 @@
 
 source venv/bin/activate
 
-DATADIR="data"
-OUTDIR="output"
+. sys.config
+
 datasets=("power-plant" "bostonHousing" "concrete" "energy" "kin8nm")
 acquisitions=("EI" "PI" "SD")
 seeds=("0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "10" "11" "12" "13" "14" "15" "16")

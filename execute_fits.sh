@@ -60,8 +60,8 @@ source venv/bin/activate
 
 #!/usr/bin/env bash
 
-#DATADIR="data"
-#OUTDIR="output"
+. sys.config
+
 datasets=("power-plant" "bostonHousing" "concrete" "energy" "kin8nm" "naval-propulsion-plant" "protein-tertiary-structure" "wine-quality-red" "yacht")
 #acquisitions=("EI" "PI" "SD")
 #seeds=("0" "1" "2" "3" "4" "5")
