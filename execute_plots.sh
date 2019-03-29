@@ -10,8 +10,8 @@ datasets=("synthetic")
 #experiment="weight_pruning_hyperprior3"
 experiment="synthetic"
 #initial_random_point=3
-version=0.2.1
+name="1_sample_per_thompson"
 
 for ds in "${datasets[@]}"; do
-    python search_analysis.py --experiment "$experiment" --data "$ds" -v "$version" --outdir "$OUTDIR"
+    python search_analysis.py --experiment "$experiment" --data "$ds" -n "$name" --outdir "$OUTDIR"
 done

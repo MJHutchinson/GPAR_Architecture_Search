@@ -33,8 +33,8 @@ parser.add_argument('-e', '--experiment', type=str,
 parser.add_argument('--rmse', action='store_true',
                     help='Perform search on the RMSE instead')
 
-parser.add_argument('-v', '--version', type=str,
-                    default='0.1.0',
+parser.add_argument('-n', '--name', type=str,
+                    required=True,
                     help='Experiment version to analyse for')
 
 parser.add_argument('--outdir', type=str, help='Directory to get output from',
@@ -44,7 +44,7 @@ args = parser.parse_args()
 
 print(args)
 
-outdir = os.path.join(args.outdir, 'searches', args.experiment, args.data, args.version) #f'/home/mjhutchinson/Documents/MachineLearning/gpar/output/searches/{args.experiment}/{args.data}'
+outdir = os.path.join(args.outdir, 'searches', args.experiment, args.data, args.name) #f'/home/mjhutchinson/Documents/MachineLearning/gpar/output/searches/{args.experiment}/{args.data}'
 
 dirs = [dir for dir in os.listdir(outdir) if os.path.isdir(os.path.join(outdir, dir))]
 
@@ -55,7 +55,7 @@ def match(file_args):
         return False
     if not args.rmse == file_args.rmse:
         return False
-    if not args.version == file_args.version:
+    if not args.name == file_args.name:
         return False
     return True
 

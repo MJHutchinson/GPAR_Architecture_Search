@@ -414,5 +414,5 @@ acquired = np.squeeze([len(result.x_tested) for result in iteration_results])
 plotting.plot_search_results(acquired, f_bests, outdir)
 
 pickle.dump(args, open(os.path.join(outdir, 'config.pkl'), 'wb'))
-yaml.dump(args, open(os.path.join(outdir, 'config.yaml'), 'wb'))
+yaml.dump(args, open(os.path.join(outdir, 'config.yaml'), 'w'))
 pickle.dump(iteration_results, open(os.path.join(outdir, 'results.pkl'), 'wb'))

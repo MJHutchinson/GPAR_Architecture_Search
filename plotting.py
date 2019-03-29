@@ -136,7 +136,7 @@ def plot_iteration(iteration, x_tested, y_tested, x_remaining, y_remaining, rema
         inds_next = x_next[:, 0] == j + min_layers
 
         for x_n, r_n in zip(x_next[inds_next], acquisition_next[inds_next]):
-            ax2.scatter(x_n[1], r_n, c=cs_remaining[j], label='New point to try')
+            ax2.scatter(x_n[1], r_n, c=cs_remaining[j], label='New point to try', zorder=10)
 
     plt.tight_layout()
     plt.legend()
