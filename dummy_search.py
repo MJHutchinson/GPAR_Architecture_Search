@@ -74,7 +74,7 @@ parser.add_argument('-t', '--thompson_samples',
                     default=4, type=int,
                     help='Number of points to sample per iteration')
 
-parser.add_argument('-ts', '--samples_per_thompson', defualt=0, type=int,
+parser.add_argument('-ts', '--samples_per_thompson', default=0, type=int,
                     help='Number of samples to use per thompson sample for acquisition, if 0, use all 50')
 
 parser.add_argument('-s', '--seed', type=int, default=0,
