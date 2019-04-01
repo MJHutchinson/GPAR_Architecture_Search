@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 import plotting_config
 
-def plot_iteration(iteration, x_tested, y_tested, x_remaining, y_remaining, remaining_acquisition, x_test, test_stats, x_next, acquisition_next, fig_dir):
+def plot_iteration(iteration, x_tested, y_tested, x_remaining, y_remaining, remaining_acquisition, x_test, test_stats, x_next, next_acquisition, fig_dir, **kwargs):
     '''
     :param iteration: Iteration we are currently on of the optimisation
     :param x_tested: The points tested so far by the search procedure
@@ -15,7 +15,7 @@ def plot_iteration(iteration, x_tested, y_tested, x_remaining, y_remaining, rema
     :param x_test: Points that have been sampled to plot mean/margins of GPAR
     :param test_stats: Statistics of the samples drawn from the GPAR model
     :param x_next: Points to be sampled in the next iteration
-    :param acquisition_next: Acquisition function at next points
+    :param next_acquisition: Acquisition function at next points
     :param fig_dir: directory to save figures in
     '''
 
@@ -135,7 +135,7 @@ def plot_iteration(iteration, x_tested, y_tested, x_remaining, y_remaining, rema
 
         inds_next = x_next[:, 0] == j + min_layers
 
-        for x_n, r_n in zip(x_next[inds_next], acquisition_next[inds_next]):
+        for x_n, r_n in zip(x_next[inds_next], next_acquisition[inds_next]):
             ax2.scatter(x_n[1], r_n, c=cs_remaining[j], label='New point to try', zorder=10)
 
     plt.tight_layout()

@@ -5,6 +5,7 @@ from collections import namedtuple, defaultdict
 
 import numpy as np
 
+import plotting
 import plotting_config as plotting_config
 
 IterationResults = namedtuple('IterationResults',
@@ -16,6 +17,16 @@ IterationResults = namedtuple('IterationResults',
                                'test_stats', 'remaining_stats',
                                'acquisition'
                                ])
+
+IterationResults = namedtuple('IterationResults',
+                              ['iteration',
+                               'x_tested', 'y_tested',
+                               'x_remaining', 'y_remaining', 'remaining_stats', 'remaining_acquisition',
+                               'x_next', 'y_next', 'next_acquisition',
+                               'x_best', 'y_best',
+                               'x_test', 'test_stats'
+                               ])
+
 Experiment = namedtuple('Experiment', ['config', 'results'])
 
 import matplotlib.pyplot as plt
@@ -37,6 +48,9 @@ parser.add_argument('-n', '--name', type=str,
                     required=True,
                     help='Experiment version to analyse for')
 
+parser.add_argument('-f', '--full', action='store_true',
+                    help='Generate plots of each iteration for the experiment')
+
 parser.add_argument('--outdir', type=str, help='Directory to get output from',
                     default='output')
 
@@ -55,8 +69,8 @@ def match(file_args):
         return False
     if not args.rmse == file_args.rmse:
         return False
-    if not args.name == file_args.name:
-        return False
+    # if not args.name == file_args.name:
+    #     return False
     return True
 
 match_dirs = []
@@ -157,3 +171,20 @@ for seed in seed_dict.keys():
         plotting_config.savefig(outdir + f'/search_results_{seed}')
         plt.close()
 
+
+if args.full:
+    for experiment in experiments:
+
+        fig_dir = os.path.join(outdir, os.path.split(experiment.config.outdir)[-1])
+
+        for iteration in experiment.results:
+            if iteration.x_next is None or iteration.x_test is None:
+                continue
+
+            plotting.plot_iteration(**iteration._asdict(), fig_dir=fig_dir)
+            pass
+
+        f_bests = np.squeeze([np.squeeze(iteration.y_best) for iteration in experiment.results])
+        acquired = np.squeeze([len(iteration.x_tested) for iteration in experiment.results])
+
+        plotting.plot_search_results(acquired, f_bests, fig_dir)

@@ -30,7 +30,7 @@ from gpar.regression import GPARRegressor
 
 B.epsilon = 1e-6  # Set regularisation a bit higher to ensure robustness.
 trace = False  # if to print out optimisation trace
-version = '0.2.2' # current version of the algorithm
+version = '0.3.0' # current version of the algorithm
 np.random.seed(0) # fix random seed
 
 parser = argparse.ArgumentParser()
@@ -85,6 +85,9 @@ parser.add_argument('-fs', '--function_seed', type=int, default=0,
 
 parser.add_argument('-m', '--max_evals', type=int, default=45,
                     help='Iterations to run the search for, accounting for thompson samples')
+
+parser.add_argument('-p', '--plot', action='store_true',
+                    help='Plot results as we go')
 
 parser.add_argument('--noise', type=float, default=0.01,
                     help='noise to model on the synthetic function, if the synthetic function is used')
@@ -217,12 +220,12 @@ layer_sizes = np.unique(x[np.where(x[:, 0] == min_layers)][:, 1])
 IterationResults = namedtuple('IterationResults',
                               ['iteration',
                                'x_tested', 'y_tested',
-                               'x_remaining', 'y_remaining',
-                               'x_next', 'y_next',
+                               'x_remaining', 'y_remaining', 'remaining_stats', 'remaining_acquisition',
+                               'x_next', 'y_next', 'next_acquisition',
                                'x_best', 'y_best',
-                               'test_stats', 'remaining_stats',
-                               'acquisition'
+                               'x_test', 'test_stats'
                                ])
+
 
 iteration_results = []
 
@@ -235,6 +238,9 @@ y_remaining = y
 # Perform initial random search
 while y_tested is None or len(y_tested) < args.initial_points:
     random_ind = np.random.choice(np.arange(len(x_remaining)), 1)
+
+    x_next = x_remaining[random_ind]
+    y_next = y_remaining[random_ind]
 
     if x_tested is None:
         x_tested = x_remaining[random_ind]
@@ -252,11 +258,10 @@ while y_tested is None or len(y_tested) < args.initial_points:
         IterationResults(
             -1,
             x_tested, unnormalise(y_tested),
-            x_remaining, unnormalise(y_remaining),
-            None, None,
+            x_remaining, unnormalise(y_remaining), None, None,
+            x_next, y_next, None,
             x_best, unnormalise(y_best),
-            None, None,
-            None
+            None, None
         )
     )
 
@@ -344,29 +349,25 @@ if not args.random:
         # Select the next points to try
         x_next = x_remaining[next_index]
         y_next = y_remaining[next_index]
-        acquisition_next = remaining_acquisition[next_index]
+        next_acquisition = remaining_acquisition[next_index]
 
         print('\t Plotting results')
         # Plot the next points in a nice format and save
-        plotting.plot_iteration(iteration,
-                                x_tested, unnormalise(y_tested),
-                                x_remaining, unnormalise(y_remaining),
-                                remaining_acquisition,
-                                x_test, test_stats,
-                                x_next, acquisition_next,
-                                outdir)
 
-        iteration_results.append(
-            IterationResults(
+        iteration_result = IterationResults(
                 iteration,
                 x_tested, unnormalise(y_tested),
-                x_remaining, unnormalise(y_remaining),
-                x_next, unnormalise(y_next),
+                x_remaining, unnormalise(y_remaining), remaining_stats, remaining_acquisition,
+                x_next, unnormalise(y_next), next_acquisition,
                 x_best, unnormalise(y_best),
-                test_stats, remaining_stats,
-                remaining_acquisition
+                x_test, test_stats
             )
-        )
+
+        if args.plot:
+            plotting.plot_iteration(**(iteration_result._asdict()),
+                                    fig_dir=outdir)
+
+        iteration_results.append(iteration_result)
 
         # Update the two sets of points available to the algorithm
         x_remaining = np.delete(x_remaining, next_index, axis=0)
@@ -385,6 +386,9 @@ else:
         print(f'Running iteration {iteration}')
         random_ind = np.random.choice(np.arange(len(x_remaining)), 1)
 
+        x_next = x_remaining[random_ind]
+        y_next = y_remaining[random_ind]
+
         x_tested = np.concatenate([x_tested, x_remaining[random_ind]], axis=0)
         y_tested = np.concatenate([y_tested, y_remaining[random_ind]], axis=0)
 
@@ -395,13 +399,12 @@ else:
 
         iteration_results.append(
             IterationResults(
-                iteration,
+                -1,
                 x_tested, unnormalise(y_tested),
-                x_remaining, unnormalise(y_remaining),
-                None, None,
+                x_remaining, unnormalise(y_remaining), None, None,
+                x_next, y_next, None,
                 x_best, unnormalise(y_best),
-                None, None,
-                None
+                None, None
             )
         )
 
@@ -411,7 +414,8 @@ else:
 f_bests = np.squeeze([np.squeeze(result.y_best) for result in iteration_results])
 acquired = np.squeeze([len(result.x_tested) for result in iteration_results])
 
-plotting.plot_search_results(acquired, f_bests, outdir)
+if args.plot:
+    plotting.plot_search_results(acquired, f_bests, outdir)
 
 pickle.dump(args, open(os.path.join(outdir, 'config.pkl'), 'wb'))
 yaml.dump(args, open(os.path.join(outdir, 'config.yaml'), 'w'))
