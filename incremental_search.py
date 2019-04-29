@@ -234,20 +234,6 @@ x_test = np.concatenate([np.stack((i * np.ones(n),
 # Assumes same layer widths for each num layers
 layer_sizes = np.unique(x[np.where(x[:, 0] == min_layers)][:, 1])
 
-IncrementalIterationResults = namedtuple('IncrementalIterationResults',
-                              [
-                                'iteration',
-                                'x',
-                                'y',
-                                'y_tested_flags',
-                                'y_next_flags',
-                                'x_test',
-                                'test_stats',
-                                'acquisition_value',
-                                'x_best', 'y_best'
-                               ])
-
-
 iteration_results = []
 
 y_tested = np.zeros(y.shape, dtype=np.bool)
@@ -257,7 +243,7 @@ y_tested = np.zeros(y.shape, dtype=np.bool)
 # y_remaining = y
 
 # Perform initial random search
-while y_tested.sum() < args.initial_points * depth:
+while y_tested.sum() < (args.initial_points * depth):
     available_set = np.arange(y_tested.shape[0])[np.where(~y_tested[:, -1])]
     next_index = np.random.choice(available_set, 1)
 
