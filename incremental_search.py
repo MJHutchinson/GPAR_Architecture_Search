@@ -146,7 +146,6 @@ def transform_x(x):
 if args.data == 'synthetic':
     np.random.seed(args.function_seed)
     torch.manual_seed(args.function_seed)
-    args.experiment = 'synthetic'
 
     x1 = np.linspace(1, 5, 5)
     x2 = np.concatenate([np.linspace(1, 9, 9), np.linspace(10, 98, 45), np.linspace(100, 980, 45)])
