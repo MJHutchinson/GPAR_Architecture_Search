@@ -37,6 +37,20 @@ trace = False  # if to print out optimisation trace
 version = '0.3.0' # current version of the algorithm
 np.random.seed(0) # fix random seed
 
+IncrementalIterationResults = namedtuple('IncrementalIterationResults',
+                              [
+                                'iteration',
+                                'x',
+                                'y',
+                                'y_tested_flags',
+                                'y_next_flags',
+                                'x_test',
+                                'test_stats',
+                                'acquisition_value',
+                                'x_best', 'y_best'
+                               ])
+
+
 parser = argparse.ArgumentParser()
 
 parser.add_argument('-d', '--data', type=str,
