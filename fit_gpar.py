@@ -101,19 +101,26 @@ x_tests = [np.stack((i * np.ones(n),
            for i in range(min_layers, max_layers + 1)]
 
 # Create GPAR.
+# model = GPARRegressor(scale=[1., .5], scale_tie=True,
+#                       linear=True, linear_scale=10., linear_with_inputs=False,
+#                       nonlinear=False, nonlinear_with_inputs=False,
+#                       markov=1,
+#                       replace=True,
+#                       noise=0.01)
+
 model = GPARRegressor(scale=[1., .5], scale_tie=True,
-                      linear=True, linear_scale=10., linear_with_inputs=False,
-                      nonlinear=False, nonlinear_with_inputs=False,
-                      markov=1,
-                      replace=True,
-                      noise=0.01)
+                          linear=True, linear_scale=10., input_linear=False,
+                          nonlinear=False, # missing non linear inputs now?
+                          markov=1,
+                          replace=True,
+                          noise=0.01)
 
 # Fit model and print hyperparameters.
 model.fit(transform_x(x), y,
-          iters=args.iters, trace=False, progressive=True)
+          iters=args.iters, trace=False, fix=True)
 if args.joint:
     model.fit(transform_x(x), y,
-              iters=args.iters, trace=False, progressive=False)
+              iters=args.iters, trace=False, fix=False) # is fi
 print('Hyperparameters:')
 for k, v in model.get_variables().items():
     print(k)

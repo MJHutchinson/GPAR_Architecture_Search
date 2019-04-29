@@ -88,6 +88,8 @@ experiments = [Experiment(pickle.load(open(os.path.join(outdir, dir, 'config.pkl
 
 experiment_types = defaultdict(list)
 
+dump_dict = {}
+
 for experiment in experiments:
     experiment_types[(experiment.config.acquisition if not experiment.config.random else "Random", experiment.config.final)].append(experiment.results)
 
@@ -121,6 +123,12 @@ for idx, key in enumerate(experiment_types.keys()):
         ax1.plot(iterations[:, 0], np.mean(iteration_results, axis=1), c=colors[idx], label=f'{key[0]} {"final only" if key[1] else "all"}')
         ax2.plot(iterations[:, 0], np.std(iteration_results, axis=1), c=colors[idx], label=f'{key[0]} {"final only" if key[1] else "all"}')
 
+        dump_dict[key] = {
+            'iterations': iterations[:, 0],
+            'mean': list(np.mean(iteration_results, axis=1)),
+            'std': list(np.std(iteration_results, axis=1))
+        }
+
         # plt.fill_between(iterations[:, 0], np.min(iteration_results, axis=1), np.max(iteration_results, axis=1), color=colors[idx], alpha=0.3)
 
         # plt.plot(iterations[:, 0], np.min(iteration_results, axis=1), c=colors[idx], linestyle='dashed')
@@ -137,6 +145,8 @@ for idx, key in enumerate(experiment_types.keys()):
 plt.legend()
 plotting_config.savefig(outdir + '/search_results')
 plt.close()
+
+pickle.dump({'name': args.name, 'data': dump_dict}, open(os.path.join(outdir, 'combined_results.pkl'), 'wb'))
 
 seed_dict = defaultdict(list)
 

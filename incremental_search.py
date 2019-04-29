@@ -4,6 +4,7 @@ import shutil
 import pickle
 import datetime
 import argparse
+from copy import deepcopy
 from collections import namedtuple
 
 import yaml
@@ -15,8 +16,8 @@ import plotting as plotting
 from gpar.regression import GPARRegressor
 
 ### Function of this script
-# This script performs architecture search over a dummy space by using a single GP + bayes opt techniques to perform
-# acquisition on the final performance of the architecture.
+# This script performs architecture search over a dummy space by using a full GPAR model to checkpoint model performance
+# and make decisions about what networks to train 
 
 ## Initialise
 
@@ -86,7 +87,7 @@ parser.add_argument('-s', '--seed', type=int, default=0,
 parser.add_argument('-fs', '--function_seed', type=int, default=0,
                     help='Random seed to use for the synthetic function')
 
-parser.add_argument('-m', '--max_evals', type=int, default=45,
+parser.add_argument('-m', '--max_evals', type=int, default=50,
                     help='Iterations to run the search for, accounting for thompson samples')
 
 parser.add_argument('-p', '--plot', action='store_true',
@@ -153,8 +154,8 @@ if args.data == 'synthetic':
     x = np.stack([np.ravel(xx1), np.ravel(xx2)], axis=1)
 
     model = GPARRegressor(scale=[2., .3], scale_tie=True,
-                          linear=True, linear_scale=10., linear_with_inputs=False,
-                          nonlinear=False, nonlinear_with_inputs=False,
+                          linear=True, linear_scale=10., input_linear=False,
+                          nonlinear=False,
                           markov=1,
                           replace=True,
                           noise=args.noise)
@@ -168,11 +169,25 @@ else:
     x = np.genfromtxt(os.path.join(data_dir, args.data, args.experiment, f'x_{"rmse" if args.rmse else "loglik"}.txt'))
     y = np.genfromtxt(os.path.join(data_dir, args.data, args.experiment, f'f_{"rmse" if args.rmse else "loglik"}.txt'))
 
+# Sort x by layer size and layer width
+inds = x[:, 1].argsort()
+
+x = x[inds]
+y = y[inds]
+
+inds = x[:, 0].argsort(kind='mergesort')
+
+x = x[inds]
+y = y[inds]
+
+
 np.random.seed(args.seed)
 torch.manual_seed(args.seed)
 
 if args.final:
     y = y[:, -1][:, np.newaxis]
+
+depth = y.shape[1]
 
 num_function_samples = max(50, args.thompson_samples * args.samples_per_thompson)
 
@@ -220,76 +235,89 @@ x_test = np.concatenate([np.stack((i * np.ones(n),
 # Assumes same layer widths for each num layers
 layer_sizes = np.unique(x[np.where(x[:, 0] == min_layers)][:, 1])
 
-IterationResults = namedtuple('IterationResults',
-                              ['iteration',
-                               'x_tested', 'y_tested',
-                               'x_remaining', 'y_remaining', 'remaining_stats', 'remaining_acquisition',
-                               'x_next', 'y_next', 'next_acquisition',
-                               'x_best', 'y_best',
-                               'x_test', 'test_stats'
+IncrementalIterationResults = namedtuple('IncrementalIterationResults',
+                              [
+                                'iteration',
+                                'x',
+                                'y',
+                                'y_tested_flags',
+                                'y_next_flags',
+                                'x_test',
+                                'test_stats',
+                                'acquisition_value',
+                                'x_best', 'y_best'
                                ])
 
 
 iteration_results = []
 
-x_tested = None
-y_tested = None
-
-x_remaining = x
-y_remaining = y
+y_tested = np.zeros(y.shape, dtype=np.bool)
+# y_tested = None
+#
+# x_remaining = x
+# y_remaining = y
 
 # Perform initial random search
-while y_tested is None or len(y_tested) < args.initial_points:
-    random_ind = np.random.choice(np.arange(len(x_remaining)), 1)
+while y_tested.sum() < args.initial_points * depth:
+    available_set = np.arange(y_tested.shape[0])[np.where(~y_tested[:, -1])]
+    next_index = np.random.choice(available_set, 1)
 
-    x_next = x_remaining[random_ind]
-    y_next = y_remaining[random_ind]
+    # Select the next points to try
+    x_next_inds = next_index
+    y_next_inds = tuple([np.ones(depth, dtype=np.int) * next_index, np.arange(depth)])
+    # Create a helpful flagged array of the next values
+    y_next = np.zeros(y.shape, dtype=np.bool)
+    y_next[y_next_inds] = True
 
-    if x_tested is None:
-        x_tested = x_remaining[random_ind]
-        y_tested = y_remaining[random_ind]
-    else:
-        x_tested = np.concatenate([x_tested, x_remaining[random_ind]], axis=0)
-        y_tested = np.concatenate([y_tested, y_remaining[random_ind]], axis=0)
+    # 'Test' the selected set of points
+    y_tested[y_next_inds] = True
 
-    x_remaining = np.delete(x, random_ind, 0)
-    y_remaining = np.delete(y, random_ind, 0)
+    y_temp = y.copy()
+    y_temp[~y_tested] = -np.inf
+    x_best, y_best = x[y_temp[:, -1].argmax()], unnormalise(y[y_temp[:, -1].argmax(), -1])
 
-    x_best, y_best = x_tested[y_tested[:, -1].argmax()], unnormalise(y_tested[y_tested[:, -1].argmax(), -1])
-
-    iteration_results.append(
-        IterationResults(
-            -1,
-            x_tested, unnormalise(y_tested),
-            x_remaining, unnormalise(y_remaining), None, None,
-            x_next, y_next, None,
-            x_best, unnormalise(y_best),
-            None, None
-        )
+    iteration_result = IncrementalIterationResults(
+        -1,
+        x.copy(), y.copy(),
+        y_tested.copy(),
+        y_next.copy(),
+        None,
+        None,
+        None,
+        x_best.copy(),
+        y_best.copy()
     )
+    iteration_results.append(iteration_result)
 
 iteration = 1
 # Iterate the search procedure. TODO: Figure better termination conditions
 if not args.random:
 
     model = GPARRegressor(scale=[1., .5], scale_tie=True,
-                          linear=True, linear_scale=10., linear_with_inputs=False,
-                          nonlinear=False, nonlinear_with_inputs=False,
+                          linear=True, linear_scale=10., input_linear=False,
+                          nonlinear=False, # missing non linear inputs now?
                           markov=1,
                           replace=True,
                           noise=0.01)
 
-    while y_tested.shape[0] < args.max_evals:
-
+    while y_tested.sum() < (args.max_evals * depth):
         # Define the GPAR model for this iteration. TODO: reuse hyper parameters from previous run as a starting point?
         print(f'Running iteration {iteration}')
 
         # Fit the GPAR model. If joint, this means we want to co-fit the parameters after the first fitting
         # Potential looses some accuracy on each layer and sometimes goes unstable as a result
         print('\t Fitting model')
-        model.fit(transform_x(x_tested), y_tested, trace=trace, progressive=True, iters=args.iters)
+
+        x_data = x.copy()
+        y_data = y.copy()
+        y_data[np.where(~y_tested)] = np.nan
+        active_inds = np.where(y_tested[:, 0])
+        x_data = x_data[active_inds]
+        y_data = y_data[active_inds]
+
+        model.fit(transform_x(x_data), y_data, trace=trace, fix=True, iters=args.iters)
         if args.joint:
-            model.fit(transform_x(x_tested), y_tested, trace=trace, progressive=False, iters=args.iters)
+            model.fit(transform_x(x_data), y_data, trace=trace, fix=False, iters=args.iters)
 
         # Sample the test points to allow us to plot the form of the GPAR function
         print('\t Predicting test points')
@@ -297,34 +325,32 @@ if not args.random:
                                                 num_samples=num_function_samples,
                                                 latent=True,
                                                 posterior=True))
-
+        print('Computing test stats')
         # Compute statistics about the test points
         test_stats = [test_samples.mean(axis=0),
                       test_samples.std(axis=0),
                       np.percentile(test_samples, 2.5, axis=0),
                       np.percentile(test_samples, 100 - 2.5, axis=0)]
 
-        # Sample the points remaining in the dataset - in reality this would be Thompson sampling of the network space
+        # Sample the points in the dataset - in reality this would be Thompson sampling of the network space
         print('\t Predicting remaining points')
-        remaining_samples = unnormalise(model.sample(transform_x(x_remaining),
-                                                     num_samples=num_function_samples,
-                                                     latent=True,
-                                                     posterior=True))
+        dataset_samples = unnormalise(model.sample(transform_x(x),
+                                                   num_samples=num_function_samples,
+                                                   latent=True,
+                                                   posterior=True))
 
-        # Statistics from the samples of remaining points
-        remaining_stats = [remaining_samples.mean(axis=0),
-                           remaining_samples.std(axis=0),
-                           np.percentile(remaining_samples, 2.5, axis=0),
-                           np.percentile(remaining_samples, 100 - 2.5, axis=0)]
-
-        # calculate the acquisition function for the next iteration. TODO: make this more flexible
-        # r_mean = remaining_stats[0]
-        # r_std = remaining_stats[1]
-        # r_delta = r_mean - y_best
+        # Statistics from the samples of points
+        dataset_stats = [dataset_samples.mean(axis=0),
+                           dataset_samples.std(axis=0),
+                           np.percentile(dataset_samples, 2.5, axis=0),
+                           np.percentile(dataset_samples, 100 - 2.5, axis=0)]
 
         if args.random:
-            remaining_acquisition = np.ones(remaining_stats[0][:, -1].shape)
-            next_index = np.random.choice(np.arange(len(remaining_stats[0])), args.thompson_samples, replace=False)
+            available_set = np.arange(y_tested.shape[0])[np.where(~y_tested[:, -1])]
+            next_ind = np.random.choice(available_set, 1)
+
+            x_next_inds = next_ind
+            y_next_inds = tuple([np.ones(depth, dtype=np.int) * next_ind, np.arange(depth, dtype=np.int)])
         else:
             if args.samples_per_thompson:
                 # list to store values in
@@ -332,13 +358,18 @@ if not args.random:
                 # loop for number of samples we want
                 for i in range(args.thompson_samples):
                     # Error check number of samples
-                    if remaining_samples.shape[0] < args.thompson_samples * args.samples_per_thompson: raise ValueError('Not enough samples to compute all points')
+                    if dataset_samples.shape[0] < args.thompson_samples * args.samples_per_thompson: raise ValueError('Not enough samples to compute all points')
                     # Select subset of full smaple space
-                    sample_subset = remaining_samples[i*args.samples_per_thompson:(i+1)*args.samples_per_thompson, :]
+                    sample_subset = dataset_samples[i * args.samples_per_thompson:(i + 1) * args.samples_per_thompson, :]
                     # Compute acquisition on the subset
-                    remaining_acquisition = acquisition_function(sample_subset, y_best)
-                    # Sort the acquisitions and get the indicies
-                    sorted_index = list(np.squeeze(remaining_acquisition).argsort(axis=0))
+                    acquisition_value = acquisition_function(sample_subset, y_best)
+                    acquisition_value = acquisition_value[:, -1]
+                    # Get which networks have been trained to completion
+                    completed = y_tested[:, -1]
+                    # Set acquisition for completed networks to -inf
+                    acquisition_value[np.where(completed)] = -np.inf
+                    # Sort the acquisitions and get the indices
+                    sorted_index = list(np.squeeze(acquisition_value).argsort(axis=0))
                     # Try to add to the next index until a valid next is added
                     next = sorted_index.pop()
                     while next in next_index:
@@ -346,82 +377,117 @@ if not args.random:
                     next_index.append(next)
 
                 next_index = np.array(next_index)
+
+                acquisition_value = acquisition_function(dataset_samples, y_best)
+                acquisition_value = acquisition_value[:, -1]
+                completed = y_tested[:, -1]
+                # Set acquisition to nan where complected for plotting
+                acquisition_value[np.where(completed)] = np.nan
             else:
-                remaining_acquisition = acquisition_function(remaining_samples, y_best)
-                remaining_acquisition = remaining_acquisition[:, -1]
+                acquisition_value = acquisition_function(dataset_samples, y_best)
+                acquisition_value = acquisition_value[:, -1]
+                completed = y_tested[:, -1]
+                # Set acquisition for completed networks to -inf
+                acquisition_value[np.where(completed)] = -np.inf
                 # Select the top next indices to try
-                next_index = np.argpartition(remaining_acquisition, len(remaining_acquisition) - args.thompson_samples)[-args.thompson_samples:]
+                next_index = np.argpartition(acquisition_value, len(acquisition_value) - args.thompson_samples)[-args.thompson_samples:]
+                # Set acquisition to nan where complected for plotting
+                acquisition_value[np.where(completed)] = np.nan
+
 
         # Select the next points to try
-        x_next = x_remaining[next_index]
-        y_next = y_remaining[next_index]
-        next_acquisition = remaining_acquisition[next_index]
+        x_next_inds = next_index
+        y_next_inds = tuple([next_index, y_tested.sum(axis=1)[next_index]])
+        # Create a helpful flagged array of the next values
+        y_next = np.zeros(y.shape, dtype=np.bool)
+        y_next[y_next_inds] = True
 
         print('\t Plotting results')
         # Plot the next points in a nice format and save
-
-        iteration_result = IterationResults(
-                iteration,
-                x_tested, unnormalise(y_tested),
-                x_remaining, unnormalise(y_remaining), remaining_stats, remaining_acquisition,
-                x_next, unnormalise(y_next), next_acquisition,
-                x_best, unnormalise(y_best),
-                x_test, test_stats
-            )
+        iteration_result = IncrementalIterationResults(
+            iteration,
+            x.copy(), y.copy(),
+            y_tested.copy(),
+            y_next.copy(),
+            x_test,
+            test_stats,
+            acquisition_value.copy(),
+            x_best.copy(),
+            y_best.copy()
+        )
 
         if args.plot:
-            plotting.plot_iteration(**(iteration_result._asdict()),
-                                    fig_dir=outdir)
-
-        iteration_results.append(iteration_result)
+            plotting.plot_iteration_incremental(**(iteration_result._asdict()),
+                                                fig_dir=outdir)
 
         # Update the two sets of points available to the algorithm
-        x_remaining = np.delete(x_remaining, next_index, axis=0)
-        y_remaining = np.delete(y_remaining, next_index, axis=0)
-
-        x_tested = np.concatenate([x_tested, x_next], axis=0)
-        y_tested = np.concatenate([y_tested, y_next], axis=0)
+        # 'Test' the selected set of points
+        y_tested[y_next_inds] = True
 
         # update the best points found so far. TODO: Maybe look at making f/x_best the best from the GPAR function, rather than the data point?
-        x_best, y_best = x_tested[y_tested[:, -1].argmax()], unnormalise(y_tested[y_tested[:, -1].argmax(), -1])
+        y_temp = y.copy()
+        y_temp[~y_tested] = -np.inf
+        x_best, y_best = x[y_temp[:, -1].argmax()], unnormalise(y[y_temp[:, -1].argmax(), -1])
+
+        iteration_results.append(iteration_result)
 
         iteration += 1
 
 else:
     while y_tested.shape[0] < args.max_evals:
         print(f'Running iteration {iteration}')
-        random_ind = np.random.choice(np.arange(len(x_remaining)), 1)
+        available_set = np.arange(y_tested.shape[0])[np.where(~y_tested[:, -1])]
+        next_index = np.random.choice(available_set, 1)
 
-        x_next = x_remaining[random_ind]
-        y_next = y_remaining[random_ind]
+        # Select the next points to try
+        x_next_inds = next_index
+        y_next_inds = tuple([np.ones(depth, dtype=np.int) * next_index, y_tested.sum(axis=1)[next_index]])
+        # Create a helpful flagged array of the next values
+        y_next = np.zeros(y.shape, dtype=np.bool)
+        y_next[y_next_inds] = True
 
-        x_tested = np.concatenate([x_tested, x_remaining[random_ind]], axis=0)
-        y_tested = np.concatenate([y_tested, y_remaining[random_ind]], axis=0)
+        # 'Test' the selected set of points
+        y_tested[y_next_inds] = True
 
-        x_remaining = np.delete(x, random_ind, 0)
-        y_remaining = np.delete(y, random_ind, 0)
+        x_best, y_best = x[y_tested[:, -1].nanargmax()], unnormalise(y_tested[y_tested[:, -1].nanargmax(), -1])
 
-        x_best, y_best = x_tested[y_tested[:, -1].argmax()], unnormalise(y_tested[y_tested[:, -1].argmax()])
+        # update the best points found so far. TODO: Maybe look at making f/x_best the best from the GPAR function, rather than the data point?
+        y_temp = y.copy()
+        y_temp[~y_tested] = -np.inf
+        x_best, y_best = x[y_temp[:, -1].argmax()], unnormalise(y[y_temp[:, -1].argmax(), -1])
 
-        iteration_results.append(
-            IterationResults(
-                -1,
-                x_tested, unnormalise(y_tested),
-                x_remaining, unnormalise(y_remaining), None, None,
-                x_next, y_next, None,
-                x_best, unnormalise(y_best),
-                None, None
-            )
+        iteration_result = IncrementalIterationResults(
+            iteration,
+            x, y,
+            y_tested,
+            y_next,
+            None,
+            None,
+            None,
+            x_best,
+            y_best
         )
 
         iteration += 1
 
+# Store final iteration results
+iteration_result = IncrementalIterationResults(
+    iteration,
+    x.copy(), y.copy(),
+    y_tested.copy(),
+    None,
+    x_test,
+    None,
+    None,
+    x_best.copy(),
+    y_best.copy()
+)
 
 f_bests = np.squeeze([np.squeeze(result.y_best) for result in iteration_results])
-acquired = np.squeeze([len(result.x_tested) for result in iteration_results])
+acquired = np.squeeze([result.y_tested_flags.sum() for result in iteration_results])
 
-if args.plot:
-    plotting.plot_search_results(acquired, f_bests, outdir)
+# if args.plot:
+plotting.plot_search_results(acquired, f_bests, outdir)
 
 pickle.dump(args, open(os.path.join(outdir, 'config.pkl'), 'wb'))
 yaml.dump(args, open(os.path.join(outdir, 'config.yaml'), 'w'))

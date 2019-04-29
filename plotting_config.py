@@ -29,6 +29,8 @@ svg_params = {
     # 'dpi': 1000
 }
 
+colors = ['tab:blue', 'tab:orange', 'tab:green', 'tab:red', 'tab:purple', 'tab:brown', 'tab:pink', 'tab:gray', 'tab:olive', 'tab:cyan']
+
 
 half_width_square = (3.15, 3.15)
 full_width_square = (6.3, 6.3)
