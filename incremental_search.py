@@ -32,7 +32,7 @@ from gpar.regression import GPARRegressor
 # Pick new points to train
 
 
-B.epsilon = 1e-6  # Set regularisation a bit higher to ensure robustness.
+B.epsilon = 1e-5  # Set regularisation a bit higher to ensure robustness.
 trace = False  # if to print out optimisation trace
 version = '0.3.0' # current version of the algorithm
 np.random.seed(0) # fix random seed
