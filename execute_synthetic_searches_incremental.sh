@@ -13,7 +13,7 @@ experiment="incremental_synthetic"
 initial_random_point=3
 thompson_samples=4
 samples_per_thompson=3
-name="3_sample_per_thompson"
+name="3_sample_per_thompson-no_refit"
 
 for ds in "${datasets[@]}"; do
 

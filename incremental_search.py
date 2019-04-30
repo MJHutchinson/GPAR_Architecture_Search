@@ -292,14 +292,22 @@ iteration = 1
 # Iterate the search procedure. TODO: Figure better termination conditions
 if not args.random:
 
-    model = GPARRegressor(scale=[1., .5], scale_tie=True,
-                          linear=True, linear_scale=10., input_linear=False,
-                          nonlinear=False, # missing non linear inputs now?
-                          markov=1,
-                          replace=True,
-                          noise=0.01)
+    # model = GPARRegressor(scale=[1., .5], scale_tie=True,
+    #                       linear=True, linear_scale=10., input_linear=False,
+    #                       nonlinear=False,  # missing non linear inputs now?
+    #                       markov=1,
+    #                       replace=True,
+    #                       noise=0.01)
 
     while y_tested.sum() < (args.max_evals * depth):
+
+        model = GPARRegressor(scale=[1., .5], scale_tie=True,
+                              linear=True, linear_scale=10., input_linear=False,
+                              nonlinear=False,  # missing non linear inputs now?
+                              markov=1,
+                              replace=True,
+                              noise=0.01)
+
         # Define the GPAR model for this iteration. TODO: reuse hyper parameters from previous run as a starting point?
         print(f'Running iteration {iteration}')
 
