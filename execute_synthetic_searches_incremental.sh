@@ -12,8 +12,8 @@ function_seed="8"
 experiment="incremental_synthetic_3_output"
 initial_random_point=3
 thompson_samples=4
-samples_per_thompson=3
-name="3_sample_per_thompson-no_refit"
+samples_per_thompson=50
+name="50_sample_per_thompson-no_refit"
 synthetic_scales="2. 0.5"
 
 for ds in "${datasets[@]}"; do
