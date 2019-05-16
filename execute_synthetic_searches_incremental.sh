@@ -6,11 +6,11 @@ source venv/bin/activate
 
 #datasets=("power-plant" "bostonHousing" "concrete" "energy" "kin8nm")
 datasets=("synthetic")
-acquisitions=("PI")  #("EI" "PI" "SD")
+acquisitions=("EI" "PI" "SD")
 seeds=("0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "10" "11" "12" "13" "14" "15" "16")
 function_seed="8"
 experiment="incremental_synthetic_3_output"
-initial_random_point=3
+initial_random_point=5
 thompson_samples=4
 samples_per_thompson=50
 name="50_sample_per_thompson-no_refit"

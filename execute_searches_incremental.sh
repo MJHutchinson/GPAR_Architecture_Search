@@ -6,7 +6,7 @@ source venv/bin/activate
 
 datasets=("power-plant" "bostonHousing" "concrete" "energy" "kin8nm")
 #datasets=("synthetic")
-acquisitions=("PI")  #("EI" "PI" "SD")
+acquisitions=("EI" "PI" "SD")
 seeds=("0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "10" "11" "12" "13" "14" "15" "16")
 experiment="weigth_pruning_hyperpior-3-output"
 initial_random_point=3
