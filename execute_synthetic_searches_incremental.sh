@@ -12,7 +12,7 @@ function_seed="8"
 experiment="incremental_synthetic_3_output"
 initial_random_point=5
 thompson_samples=4
-samples_per_thompson=50
+samples_per_thompson=0
 name="50_sample_per_thompson-no_refit"
 synthetic_scales="2. 0.5"
 
