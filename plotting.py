@@ -334,17 +334,3 @@ def plot_iteration_incremental(iteration, x, y, y_tested_flags, y_next_flags, x_
     plt.legend()
     plotting_config.savefig(fig_dir + f'/iteration_{iteration}_incremental')
     plt.close('all')
-
-
-import datetime
-import imageio
-
-VALID_EXTENSIONS = ('png', 'jpg')
-
-
-def create_gif(filenames, duration, filepath):
-    images = []
-    for filename in filenames:
-        images.append(imageio.imread(filename))
-    output_file = filepath + '.gif'
-    imageio.mimsave(output_file, images, duration=duration)
