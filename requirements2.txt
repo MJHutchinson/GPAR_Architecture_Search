@@ -7,10 +7,8 @@ coverage==4.5.3
 coveralls==1.7.0
 cycler==0.10.0
 docopt==0.6.2
-fdm==0.1.0
 future==0.17.1
 gast==0.2.2
-gpar==0.1.0
 grpcio==1.20.1
 h5py==2.9.0
 idna==2.8
@@ -18,7 +16,6 @@ imageio==2.5.0
 Keras-Applications==1.0.7
 Keras-Preprocessing==1.0.9
 kiwisolver==1.0.1
-lab==0.1.0
 Markdown==3.1
 matplotlib==3.0.3
 mock==3.0.5
@@ -26,7 +23,6 @@ nose==1.3.7
 numpy==1.16.3
 pandas==0.24.2
 Pillow==6.0.0
-plum==0.1.0
 protobuf==3.7.1
 pyparsing==2.3.1
 python-dateutil==2.8.0
@@ -35,7 +31,6 @@ PyYAML==5.1
 requests==2.21.0
 scipy==1.2.1
 six==1.12.0
-stheno==0.1.0
 tensorboard==1.13.1
 tensorflow==1.13.1
 tensorflow-estimator==1.13.0
@@ -43,5 +38,10 @@ termcolor==1.1.0
 torch==1.1.0
 tqdm==4.31.1
 urllib3==1.24.1
-varz==0.1.0
 Werkzeug==0.15.4
+git+git://github.com/wesselb/plum@master#egg=plum
+git+git://github.com/wesselb/lab@master#egg=lab
+git+git://github.com/wesselb/stheno@master#egg=stheno
+git+git://github.com/wesselb/fdm@master#egg=fdm
+git+git://github.com/wesselb/varz@master#egg=varz
+git+git://github.com/wesselb/gpar@master#egg=gpar
