@@ -14,7 +14,7 @@ initial_random_point=5
 thompson_samples=4
 samples_per_thompson=50
 name="50_sample_per_thompson-no_refit"
-synthetic_scales="2. 0.5"
+synthetic_scales=" 2. 0.5 "
 
 for ds in "${datasets[@]}"; do
 
