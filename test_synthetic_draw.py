@@ -42,7 +42,7 @@ x = np.stack([np.ravel(xx1), np.ravel(xx2)], axis=1)
 #                               replace=True,
 #                               noise=args.noise)
 
-model = GPARRegressor(scale=[2., .3], scale_tie=True,
+model = GPARRegressor(scale=[2., 0.5], scale_tie=True,
                           linear=True, linear_scale=10., input_linear=False,
                           nonlinear=False, # missing non linear inputs now?
                           markov=1,

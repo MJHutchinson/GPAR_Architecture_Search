@@ -120,6 +120,10 @@ parser.add_argument('--outdir', type=str,
 
 parser.add_argument('--name', type=str, required=True, help='Name to give the experiment')
 
+parser.add_argument('--synthetic_scales', nargs=2, type=float, metavar=('Depth Scale', 'Width Scale'),
+                    help='2 argument list to determine the length scales of the generator function', default=[2., 0.5])
+
+
 args = parser.parse_args()
 
 args.version = version
@@ -166,14 +170,17 @@ if args.data == 'synthetic':
     xx1, xx2 = np.meshgrid(x1, x2)
     x = np.stack([np.ravel(xx1), np.ravel(xx2)], axis=1)
 
-    model = GPARRegressor(scale=[2., .3], scale_tie=True,
+    if len(args.synthetic_scales) != 2:
+        raise ValueError('Requires exactly 2 synthetic scale arguments')
+
+    model = GPARRegressor(scale=args.synthetic_scales, scale_tie=True,
                           linear=True, linear_scale=10., input_linear=False,
                           nonlinear=False,
-                          markov=1,
+                          markov=None,
                           replace=True,
                           noise=args.noise)
 
-    n = 10
+    n = 3
 
     y = model.sample(transform_x(x), p=n, latent=False)
 

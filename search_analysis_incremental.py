@@ -4,6 +4,7 @@ import argparse
 from collections import namedtuple, defaultdict
 
 import numpy as np
+from tqdm import tqdm
 
 import plotting
 import plotting_config as plotting_config
@@ -178,18 +179,22 @@ experiments = [Experiment(pickle.load(open(os.path.join(outdir, dir, 'config.pkl
 
 
 if args.full:
-    for experiment in experiments:
+    for experiment in tqdm(experiments, desc='Looping experiments'):
 
         fig_dir = os.path.join(outdir, os.path.split(experiment.config.outdir)[-1])
 
-        for iteration in experiment.results:
+        ## make incremental gif
+
+        images = [img for img in os.listdir(fig_dir) if img]
+
+        for iteration in tqdm(experiment.results, desc='Looping iterations'):
             if iteration.x_test is None:
                 continue
 
             plotting.plot_iteration_incremental(**iteration._asdict(), fig_dir=fig_dir)
             pass
 
-        f_bests = np.squeeze([np.squeeze(iteration.y_best) for iteration in experiment.results])
-        acquired = np.squeeze([len(iteration.x_tested) for iteration in experiment.results])
+        f_bests = np.squeeze([np.squeeze(result.y_best) for result in experiment.results])
+        acquired = np.squeeze([result.y_tested_flags.sum() for result in experiment.results])
 
         plotting.plot_search_results(acquired, f_bests, fig_dir)

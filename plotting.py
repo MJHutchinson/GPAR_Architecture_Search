@@ -5,6 +5,10 @@ import matplotlib.pyplot as plt
 
 import plotting_config
 
+import warnings
+import matplotlib.cbook
+warnings.filterwarnings("ignore",category=matplotlib.cbook.mplDeprecation)
+
 def plot_iteration(iteration, x_tested, y_tested, x_remaining, y_remaining, remaining_acquisition, x_test, test_stats, x_next, next_acquisition, fig_dir, **kwargs):
     '''
     :param iteration: Iteration we are currently on of the optimisation
@@ -205,7 +209,6 @@ def plot_iteration_incremental(iteration, x, y, y_tested_flags, y_next_flags, x_
             inds_test = np.where(x_test[:, 0] == j + min_layers)
             inds_tested = np.where((x[:, 0] == j + min_layers) & y_tested_flags[:, i])
             inds_remaining = np.where((x[:, 0] == j + min_layers) & ~y_tested_flags[:, i])
-            inds_next = np.where((x[:, 0] == j + min_layers) & y_next_flags[:, i])
 
             mean_test = test_stats[0]
             std_test = test_stats[1]
@@ -216,26 +219,30 @@ def plot_iteration_incremental(iteration, x, y, y_tested_flags, y_next_flags, x_
                          label=f'Prediction ({j + min_layers} layers)', c=cs[j], ls='--')
 
             plt.fill_between(np.squeeze(x_test[inds_test, 1]), np.squeeze(lowers_test[inds_test, i]), np.squeeze(uppers_test[inds_test, i]), color=cs[j],
-                             alpha=0.3)
+                             alpha=0.3, zorder=10+j)
 
             # plt.fill_between(x_test[inds_test, 1], mean_test[inds_test, i] - std_test[inds_test, i],
             #                  mean_test[inds_test, i] + std_test[inds_test, i], color=cs[j],
             #                  alpha=0.3)
 
-            plt.scatter(x_remaining[inds_remaining, 1], y_remaining[inds_remaining, i],
-                        label=f'Expected improvement: {j} layers', c=cs_remaining[j], zorder=10+j)
+            #plt.scatter(x_remaining[inds_remaining, 1], y_remaining[inds_remaining, i],
+            #            label=f'Expected improvement: {j} layers', c=cs_remaining[j], zorder=j)
 
             # plt.errorbar(x_remaining[inds_remaining, 1], mean_rem[inds_remaining, i], yerr=std_rem[inds_remaining, i],
             #              fmt='o', label=f'Expected improvement: {j} layers', c=cs_remaining[j])
 
             plt.scatter(x_tested[inds_tested, 1], y_tested[inds_tested, i], c=cs[j],
-                        label=f'Points tested: {j + min_layers} layers', zorder=9)
+                        label=f'Points tested: {j + min_layers} layers', zorder=20+j)
+
+
+        for j in range(max_layers - min_layers + 1):
+            inds_next = np.where((x[:, 0] == j + min_layers) & y_next_flags[:, i])
 
             axes = plt.gca()
             y_lim = axes.get_ylim()
 
             for x_n in x[inds_next]:
-                plt.plot([x_n[1], x_n[1]], y_lim, c=cs[j], label='New point to try')
+                plt.plot([x_n[1], x_n[1]], y_lim, c=cs[j], label='New point to try', zorder=30)
 
             axes.set_ylim(y_lim)
 
@@ -327,3 +334,17 @@ def plot_iteration_incremental(iteration, x, y, y_tested_flags, y_next_flags, x_
     plt.legend()
     plotting_config.savefig(fig_dir + f'/iteration_{iteration}_incremental')
     plt.close('all')
+
+
+import datetime
+import imageio
+
+VALID_EXTENSIONS = ('png', 'jpg')
+
+
+def create_gif(filenames, duration, filepath):
+    images = []
+    for filename in filenames:
+        images.append(imageio.imread(filename))
+    output_file = filepath + '.gif'
+    imageio.mimsave(output_file, images, duration=duration)
