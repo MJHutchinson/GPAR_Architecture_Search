@@ -19,10 +19,10 @@ synthetic_scales="2. 0.5"
 for ds in "${datasets[@]}"; do
 
     for seed in "${seeds[@]}"; do
-            echo python incremental_search.py --name "$name"  --data "$ds" --experiment "$experiment" --function_seed "$function_seed" --synthetic_scales "$synthetic_scales" --noise 0.01 --seed "$seed" --thompson_samples "$thompson_samples" --samples_per_thompson "$samples_per_thompson" --random --datadir "$DATADIR" --outdir "$OUTDIR"
+            python incremental_search.py --name "$name"  --data "$ds" --experiment "$experiment" --function_seed "$function_seed" --synthetic_scales "$synthetic_scales" --noise 0.01 --seed "$seed" --thompson_samples "$thompson_samples" --samples_per_thompson "$samples_per_thompson" --random --datadir "$DATADIR" --outdir "$OUTDIR"
 
         for acquisition in "${acquisitions[@]}"; do
-            echo python incremental_search.py --name "$name" --data "$ds" --experiment "$experiment" --function_seed "$function_seed" --synthetic_scales "$synthetic_scales" --noise 0.01 --seed "$seed" --thompson_samples "$thompson_samples" --samples_per_thompson "$samples_per_thompson" --acquisition "$acquisition" --datadir "$DATADIR" --outdir "$OUTDIR"
+            python incremental_search.py --name "$name" --data "$ds" --experiment "$experiment" --function_seed "$function_seed" --synthetic_scales "$synthetic_scales" --noise 0.01 --seed "$seed" --thompson_samples "$thompson_samples" --samples_per_thompson "$samples_per_thompson" --acquisition "$acquisition" --datadir "$DATADIR" --outdir "$OUTDIR"
 #            python dummy_search.py --data "$ds" --experiment "$experiment" --function_seed "$function_seed" --noise 0.02 --seed "$seed" --thompson_samples "$thompson_samples" --acquisition "$acquisition" --datadir "$DATADIR" --outdir "$OUTDIR"
         done
     done
