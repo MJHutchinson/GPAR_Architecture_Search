@@ -1,4 +1,5 @@
 import os
+import sys
 import time
 import pickle
 import argparse
@@ -56,6 +57,27 @@ args = parser.parse_args()
 
 print(args)
 
+data_dir = '/home/mjhutchinson/Documents/MachineLearning/architecture_search_gpar/data/'  # The data is located here.
+fig_dir = f'/home/mjhutchinson/Documents/MachineLearning/architecture_search_gpar/output/fits/{args.experiment}/{args.subexperiment + "/" if args.subexperiment is not None else ""}'
+os.makedirs(fig_dir, exist_ok=True)
+
+fig_path = os.path.join(fig_dir, f'{args.data}-'
+                                    f'{"rmse" if args.rmse else "loglik"}-'
+                                    f'{"final" if args.final else "all"}-'
+                                    f'{"validsmall" if args.validsmall else "validbig"}-'
+                                    f'{"joint-" if args.joint else ""}'
+                                    f'{"scale_tie-" if args.scale_tie else ""}'
+                                    f'{"input_linear-" if args.input_linear else ""}'
+                                    f'{"output_linear-" if args.output_linear else ""}'
+                                    f'{"output_nonlinear-" if args.output_nonlinear else ""}'
+                                    f'markov_{args.markov}-'
+                                    f'{args.seed}'
+                        )
+
+if os.path.isfile(fig_path + '.png'):
+    print('Experiment already run. Exiting')
+    sys.exit(0)
+
 np.random.seed(args.seed)
 
 if args.markov == 0: args.markov = None
@@ -75,10 +97,6 @@ model = GPARRegressor(scale=[1., .5],
 #                           markov=1,
 #                           replace=True,
 #                           noise=0.01)
-
-data_dir = '/home/mjhutchinson/Documents/MachineLearning/architecture_search_gpar/data/'  # The data is located here.
-fig_dir = f'/home/mjhutchinson/Documents/MachineLearning/architecture_search_gpar/output/fits/{args.experiment}/{args.subexperiment + "/" if args.subexperiment is not None else ""}'
-os.makedirs(fig_dir, exist_ok=True)
 
 # Load data.
 formatting_args = (data_dir,
@@ -300,19 +318,6 @@ else:
             # plt.scatter(x_valid[inds, 1], y_valid[inds, i],
             #             label='Train points ({} layers)'.format(j), c=c_valid, zorder=9)
 
-
-fig_path = os.path.join(fig_dir, f'{args.data}-'
-                                    f'{"rmse" if args.rmse else "loglik"}-'
-                                    f'{"final" if args.final else "all"}-'
-                                    f'{"validsmall" if args.validsmall else "validbig"}-'
-                                    f'{"joint-" if args.joint else ""}'
-                                    f'{"scale_tie-" if args.scale_tie else ""}'
-                                    f'{"input_linear-" if args.input_linear else ""}'
-                                    f'{"output_linear-" if args.output_linear else ""}'
-                                    f'{"output_nonlinear-" if args.output_nonlinear else ""}'
-                                    f'markov_{args.markov}-'
-                                    f'{args.seed}'
-                        )
 plt.tight_layout()
 plt.legend()
 plt.subplots_adjust(top=0.85)

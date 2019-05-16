@@ -280,7 +280,7 @@ while y_tested.sum() < (args.initial_points * depth):
 
     y_temp = y.copy()
     y_temp[~y_tested] = -np.inf
-    x_best, y_best = x[y_temp[:, -1].argmax()], unnormalise(y[y_temp[:, -1].argmax(), -1])
+    x_best, y_best = x[y_temp[:, -1].argmax()], y[y_temp[:, -1].argmax(), -1]
 
     iteration_result = IncrementalIterationResults(
         -1,
@@ -441,7 +441,7 @@ if not args.random:
         # update the best points found so far. TODO: Maybe look at making f/x_best the best from the GPAR function, rather than the data point?
         y_temp = y.copy()
         y_temp[~y_tested] = -np.inf
-        x_best, y_best = x[y_temp[:, -1].argmax()], unnormalise(y[y_temp[:, -1].argmax(), -1])
+        x_best, y_best = x[y_temp[:, -1].argmax()], y[y_temp[:, -1].argmax(), -1]
 
         iteration_results.append(iteration_result)
 
@@ -468,18 +468,18 @@ else:
         # update the best points found so far. TODO: Maybe look at making f/x_best the best from the GPAR function, rather than the data point?
         y_temp = y.copy()
         y_temp[~y_tested] = -np.inf
-        x_best, y_best = x[y_temp[:, -1].argmax()], unnormalise(y[y_temp[:, -1].argmax(), -1])
+        x_best, y_best = x[y_temp[:, -1].argmax()], y[y_temp[:, -1].argmax(), -1]
 
         iteration_result = IncrementalIterationResults(
             iteration,
-            x, y,
-            y_tested,
-            y_next,
+            x.copy(), y.copy(),
+            y_tested.copy(),
+            y_next.copy(),
             None,
             None,
             None,
-            x_best,
-            y_best
+            x_best.copy(),
+            y_best.copy()
         )
 
         iteration += 1
