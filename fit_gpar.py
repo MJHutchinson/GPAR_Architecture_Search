@@ -57,6 +57,9 @@ args = parser.parse_args()
 
 print(args)
 
+if args.markov == 0: args.markov = None
+
+
 data_dir = '/home/mjhutchinson/Documents/MachineLearning/architecture_search_gpar/data/'  # The data is located here.
 fig_dir = f'/home/mjhutchinson/Documents/MachineLearning/architecture_search_gpar/output/fits/{args.experiment}/{args.subexperiment + "/" if args.subexperiment is not None else ""}'
 os.makedirs(fig_dir, exist_ok=True)
@@ -80,7 +83,6 @@ if os.path.isfile(fig_path + '.png'):
 
 np.random.seed(args.seed)
 
-if args.markov == 0: args.markov = None
 
 model = GPARRegressor(scale=[1., .5],
                       scale_tie=args.scale_tie,
@@ -139,6 +141,8 @@ def gen_dataset(x, y):
     # return x[::2, :],y[::2, :],x[1::2, :],y[1::2, :]
     inds = np.arange(len(x))
     np.random.shuffle(inds)
+    x, y = x[inds], y[inds]
+
     if args.validsmall:
         middle = 12
     else:
