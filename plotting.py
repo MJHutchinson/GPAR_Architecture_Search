@@ -152,7 +152,7 @@ def plot_search_results(aquisitions, f_bests, fig_dir):
 
     plt.figure(figsize=(10,5))
     plt.title('Evolution of best results found at number of evaluated points')
-    plt.plot(aquisitions, f_bests[:, -1], 'b')
+    plt.plot(aquisitions, f_bests, 'b')
 
     plt.xlabel('Points evaluated')
     plt.ylabel('Maximum function value')

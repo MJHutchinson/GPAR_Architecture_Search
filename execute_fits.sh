@@ -69,42 +69,44 @@ seeds=("0" "1" "2" "3" "4" "5")
 #experiment="weight_pruning_hyperprior3"
 #initial_random_point=3
 
-#for ds in "${datasets[@]}"; do
-##    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --rmse --final
-##    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --rmse
-##    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --final
-##    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds"
-#
-#
-#    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --subexperiment hypersetting_comparison --output_linear                     --markov 3
-#    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --subexperiment hypersetting_comparison --output_linear --joint             --markov 3
-#    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --subexperiment hypersetting_comparison --output_linear         --scale_tie --markov 3
-#    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --subexperiment hypersetting_comparison --output_linear --joint --scale_tie --markov 3
-#    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --subexperiment hypersetting_comparison --output_linear                     --markov 1
-#    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --subexperiment hypersetting_comparison --output_linear --joint             --markov 1
-#    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --subexperiment hypersetting_comparison --output_linear         --scale_tie --markov 1
-#    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --subexperiment hypersetting_comparison --output_linear --joint --scale_tie --markov 1
-#    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --subexperiment hypersetting_comparison --output_linear                     --markov 0
-#    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --subexperiment hypersetting_comparison --output_linear --joint             --markov 0
-#    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --subexperiment hypersetting_comparison --output_linear         --scale_tie --markov 0
-#    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --subexperiment hypersetting_comparison --output_linear --joint --scale_tie --markov 0
-#
-#    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --subexperiment hypersetting_comparison --validsmall --output_linear                     --markov 3
-#    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --subexperiment hypersetting_comparison --validsmall --output_linear --joint             --markov 3
-#    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --subexperiment hypersetting_comparison --validsmall --output_linear         --scale_tie --markov 3
-#    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --subexperiment hypersetting_comparison --validsmall --output_linear --joint --scale_tie --markov 3
-#    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --subexperiment hypersetting_comparison --validsmall --output_linear                     --markov 1
-#    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --subexperiment hypersetting_comparison --validsmall --output_linear --joint             --markov 1
-#    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --subexperiment hypersetting_comparison --validsmall --output_linear         --scale_tie --markov 1
-#    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --subexperiment hypersetting_comparison --validsmall --output_linear --joint --scale_tie --markov 1
-#    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --subexperiment hypersetting_comparison --validsmall --output_linear                     --markov 0
-#    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --subexperiment hypersetting_comparison --validsmall --output_linear --joint             --markov 0
-#    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --subexperiment hypersetting_comparison --validsmall --output_linear         --scale_tie --markov 0
-#    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --subexperiment hypersetting_comparison --validsmall --output_linear --joint --scale_tie --markov 0
-#
-#done
 
 for seed in "${seeds[@]}"; do
+
+    #for ds in "${datasets[@]}"; do
+    ##    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --rmse --final
+    ##    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --rmse
+    ##    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --final
+    ##    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds"
+    #
+    #
+    #    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --subexperiment hypersetting_comparison --output_linear                     --markov 3
+    #    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --subexperiment hypersetting_comparison --output_linear --joint             --markov 3
+    #    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --subexperiment hypersetting_comparison --output_linear         --scale_tie --markov 3
+    #    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --subexperiment hypersetting_comparison --output_linear --joint --scale_tie --markov 3
+    #    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --subexperiment hypersetting_comparison --output_linear                     --markov 1
+    #    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --subexperiment hypersetting_comparison --output_linear --joint             --markov 1
+    #    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --subexperiment hypersetting_comparison --output_linear         --scale_tie --markov 1
+    #    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --subexperiment hypersetting_comparison --output_linear --joint --scale_tie --markov 1
+    #    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --subexperiment hypersetting_comparison --output_linear                     --markov 0
+    #    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --subexperiment hypersetting_comparison --output_linear --joint             --markov 0
+    #    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --subexperiment hypersetting_comparison --output_linear         --scale_tie --markov 0
+    #    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --subexperiment hypersetting_comparison --output_linear --joint --scale_tie --markov 0
+    #
+    #    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --subexperiment hypersetting_comparison --validsmall --output_linear                     --markov 3
+    #    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --subexperiment hypersetting_comparison --validsmall --output_linear --joint             --markov 3
+    #    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --subexperiment hypersetting_comparison --validsmall --output_linear         --scale_tie --markov 3
+    #    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --subexperiment hypersetting_comparison --validsmall --output_linear --joint --scale_tie --markov 3
+    #    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --subexperiment hypersetting_comparison --validsmall --output_linear                     --markov 1
+    #    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --subexperiment hypersetting_comparison --validsmall --output_linear --joint             --markov 1
+    #    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --subexperiment hypersetting_comparison --validsmall --output_linear         --scale_tie --markov 1
+    #    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --subexperiment hypersetting_comparison --validsmall --output_linear --joint --scale_tie --markov 1
+    #    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --subexperiment hypersetting_comparison --validsmall --output_linear                     --markov 0
+    #    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --subexperiment hypersetting_comparison --validsmall --output_linear --joint             --markov 0
+    #    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --subexperiment hypersetting_comparison --validsmall --output_linear         --scale_tie --markov 0
+    #    python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --subexperiment hypersetting_comparison --validsmall --output_linear --joint --scale_tie --markov 0
+    #
+    #done
+
     for ds in "${datasets[@]}"; do
 
         python fit_gpar.py --experiment weight_pruning_hyperprior3 --data "$ds" --seed "$seed" --markov 1 --joint --subexperiment kernal_comparison                                                   --markov 0
