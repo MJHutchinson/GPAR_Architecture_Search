@@ -15,6 +15,6 @@ names=("50_sample_per_thompson-no_refit")
 
 for ds in "${datasets[@]}"; do
     for name in "${names[@]}"; do
-        python search_analysis_incremental.py --experiment "$experiment" --data "$ds" -n "$name" --outdir "$OUTDIR" --full
+        python search_analysis_incremental.py --experiment "$experiment" --data "$ds" -n "$name" --outdir "$OUTDIR"
     done
 done

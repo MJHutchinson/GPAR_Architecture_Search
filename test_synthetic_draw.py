@@ -49,7 +49,7 @@ model = GPARRegressor(scale=[2., 0.5], scale_tie=True,
                           replace=True,
                           noise=args.noise)
 
-n = 10
+n = 3
 
 y = model.sample(transform_x(x), p=n, latent=args.latent)
 plt.figure(figsize=(20, 10))
