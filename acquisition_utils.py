@@ -7,10 +7,13 @@ def expected_improvement(f_samples, f_best):
     f_mean = np.mean(f_samples, axis=0)
     f_delta = f_mean - f_best
     f_std = np.std(f_samples, axis=0)
+    Z = f_delta / f_std
 
-    EI = f_delta + \
-         f_std * norm.pdf(f_delta / f_std) - \
-         np.abs(f_delta) * norm.cdf(-np.abs(f_delta) / f_std)
+    EI = f_delta * norm.cdf(Z) + f_std * norm.pdf(Z)
+
+    # EI = f_delta + \
+    #      f_std * norm.pdf(f_delta / f_std) - \
+    #      np.abs(f_delta) * norm.cdf(-np.abs(f_delta) / f_std)
 
     # EI = np.clip(EI, a_min=0, a_max=None)
 

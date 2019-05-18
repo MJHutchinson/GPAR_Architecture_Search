@@ -503,6 +503,7 @@ pickle.dump(iteration_results, open(os.path.join(outdir, 'results.pkl'), 'wb'))
 
 f_bests = np.squeeze([np.squeeze(result.y_best) for result in iteration_results])
 acquired = np.squeeze([result.y_tested_flags.sum() for result in iteration_results])
+f_max = iteration_results[-1].y[:, -1].max()
 
 # if args.plot:
-plotting.plot_search_results(acquired, f_bests, outdir)
+plotting.plot_search_results(acquired, f_bests, f_max, outdir)

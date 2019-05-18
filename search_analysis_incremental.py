@@ -191,10 +191,11 @@ if args.full:
             if iteration.x_test is None:
                 continue
 
-            plotting.plot_iteration_incremental(**iteration._asdict(), fig_dir=fig_dir)
+            # plotting.plot_iteration_incremental(**iteration._asdict(), fig_dir=fig_dir)
             pass
 
         f_bests = np.squeeze([np.squeeze(result.y_best) for result in experiment.results])
         acquired = np.squeeze([result.y_tested_flags.sum() for result in experiment.results])
+        f_max = experiment.results[-1].y[:, -1].max()
 
-        plotting.plot_search_results(acquired, f_bests, fig_dir)
+        plotting.plot_search_results(acquired, f_bests, f_max, fig_dir)

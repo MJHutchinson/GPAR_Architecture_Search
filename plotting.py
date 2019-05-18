@@ -3,7 +3,7 @@ from math import ceil
 import numpy as np
 import matplotlib.pyplot as plt
 
-import plotting_config
+from plotting_config import *
 
 import warnings
 import matplotlib.cbook
@@ -89,7 +89,7 @@ def plot_iteration(iteration, x_tested, y_tested, x_remaining, y_remaining, rema
 
     plt.tight_layout()
     plt.subplots_adjust(top=0.85)
-    plotting_config.savefig(fig_dir + f'/iteration_{iteration}')
+    savefig(fig_dir + f'/iteration_{iteration}')
     plt.close('all')
 
 
@@ -145,19 +145,20 @@ def plot_iteration(iteration, x_tested, y_tested, x_remaining, y_remaining, rema
 
     plt.tight_layout()
     plt.legend()
-    plotting_config.savefig(fig_dir + f'/iteration_{iteration}_expected_improv')
+    savefig(fig_dir + f'/iteration_{iteration}_expected_improv')
     plt.close('all')
 
-def plot_search_results(aquisitions, f_bests, fig_dir):
+def plot_search_results(aquisitions, f_bests, f_max, fig_dir):
 
-    plt.figure(figsize=(10,5))
+    plt.figure(figsize=(text_width, text_width/1.5))
     plt.title('Evolution of best results found at number of evaluated points')
     plt.plot(aquisitions, f_bests, 'b')
+    plt.axhline(f_max)
 
     plt.xlabel('Points evaluated')
     plt.ylabel('Maximum function value')
 
-    plotting_config.savefig(fig_dir + '/search_results')
+    savefig(fig_dir + '/search_results')
 
     plt.close('all')
 
@@ -251,7 +252,7 @@ def plot_iteration_incremental(iteration, x, y, y_tested_flags, y_next_flags, x_
 
     plt.tight_layout()
     plt.subplots_adjust(top=0.85)
-    plotting_config.savefig(fig_dir + f'/iteration_{iteration}')
+    savefig(fig_dir + f'/iteration_{iteration}')
     plt.close('all')
 
 
@@ -304,7 +305,7 @@ def plot_iteration_incremental(iteration, x, y, y_tested_flags, y_next_flags, x_
 
     plt.tight_layout()
     plt.legend()
-    plotting_config.savefig(fig_dir + f'/iteration_{iteration}_expected_improv')
+    savefig(fig_dir + f'/iteration_{iteration}_expected_improv')
     plt.close('all')
 
     # This ASSUMES x is in the order we want, and each layer is in the same order, and that the individual
@@ -332,5 +333,5 @@ def plot_iteration_incremental(iteration, x, y, y_tested_flags, y_next_flags, x_
 
     plt.tight_layout()
     plt.legend()
-    plotting_config.savefig(fig_dir + f'/iteration_{iteration}_incremental')
+    savefig(fig_dir + f'/iteration_{iteration}_incremental')
     plt.close('all')
