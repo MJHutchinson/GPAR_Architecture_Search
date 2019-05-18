@@ -238,7 +238,7 @@ print('   max:', max_layers)
 # Normalise data.
 y_means = y.mean(axis=0, keepdims=True)
 y_stds = y.std(axis=0, keepdims=True)
-y = (y - y_means) / y_stds
+y_normalised = (y - y_means) / y_stds
 
 # Define the function to unnormalise y data
 def unnormalise(y):
@@ -323,7 +323,7 @@ if not args.random:
         print('\t Fitting model')
 
         x_data = x.copy()
-        y_data = y.copy()
+        y_data = y_normalised.copy()
         y_data[np.where(~y_tested)] = np.nan
         active_inds = np.where(y_tested[:, 0])
         x_data = x_data[active_inds]
@@ -441,7 +441,7 @@ if not args.random:
         # update the best points found so far. TODO: Maybe look at making f/x_best the best from the GPAR function, rather than the data point?
         y_temp = y.copy()
         y_temp[~y_tested] = -np.inf
-        x_best, y_best = x[y_temp[:, -1].argmax()], y[y_temp[:, -1].argmax(), -1]
+        x_best, y_best = x[y_temp[:, -1].argmax()].copy(), y[y_temp[:, -1].argmax(), -1].copy()
 
         iteration_results.append(iteration_result)
 

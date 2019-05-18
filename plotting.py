@@ -152,11 +152,13 @@ def plot_search_results(aquisitions, f_bests, f_max, fig_dir):
 
     plt.figure(figsize=(text_width, text_width/1.5))
     plt.title('Evolution of best results found at number of evaluated points')
-    plt.plot(aquisitions, f_bests, 'b')
-    plt.axhline(f_max)
+    plt.plot(aquisitions, f_bests, 'b', label='Search progress')
+    plt.axhline(f_max, label='Objective')
 
     plt.xlabel('Points evaluated')
     plt.ylabel('Maximum function value')
+
+    plt.legend()
 
     savefig(fig_dir + '/search_results')
 
