@@ -60,7 +60,7 @@ print(args)
 if args.markov == 0: args.markov = None
 
 
-data_dir = '/home/mjhutchinson/Documents/MachineLearning/architecture_search_gpar/data/'  # The data is located here.
+data_dir = '/home/mjhutchinson/Documents/MachineLearning/architecture_search_gpar/data'  # The data is located here.
 fig_dir = f'/home/mjhutchinson/Documents/MachineLearning/architecture_search_gpar/output/fits/{args.experiment}/{args.subexperiment + "/" if args.subexperiment is not None else ""}'
 os.makedirs(fig_dir, exist_ok=True)
 
@@ -305,7 +305,7 @@ else:
     cs = ['tab:red', 'tab:blue', 'tab:green']
     cs_valid = ['tab:pink', 'tab:cyan', 'tab:olive']
     for i in range(y.shape[1]):
-        plt.subplot(2, 5, i + 1)
+        plt.subplot(1, 3, i + 1)
         plt.title('Output {}'.format(i + 1))
 
         for j, (x_test, (means, sdev, lowers, uppers), c, c_valid) \

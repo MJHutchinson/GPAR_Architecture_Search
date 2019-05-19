@@ -4,9 +4,11 @@ source venv/bin/activate
 
 . sys.config
 
-datasets=("power-plant" "bostonHousing" "concrete" "energy" "kin8nm")
+#datasets=("power-plant" "bostonHousing" "concrete" "energy" "kin8nm")
+#datasets=("wine" "yacht")
+datasets=("power-plant" "bostonHousing" "concrete" "energy" "kin8nm" "wine" "yacht")
 #datasets=("synthetic")
-acquisitions=("EI") # "PI" "SD")
+acquisitions=("EI" "PI" "SD")
 seeds=("0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "10" "11" "12" "13" "14" "15" "16")
 experiment="weight_pruning_hyperprior3-3-output"
 initial_random_point=3

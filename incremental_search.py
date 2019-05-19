@@ -313,7 +313,8 @@ if not args.random:
                               nonlinear=False,  # missing non linear inputs now?
                               markov=1,
                               replace=True,
-                              noise=0.01)
+                              noise=0.01,
+                              normalise_y=True)
 
         # Define the GPAR model for this iteration. TODO: reuse hyper parameters from previous run as a starting point?
         print(f'Running iteration {iteration}')

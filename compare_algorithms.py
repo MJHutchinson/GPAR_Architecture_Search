@@ -7,7 +7,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import plotting
-import plotting_config as pc
+from plotting_config import *
 
 
 
@@ -34,9 +34,26 @@ dirs = [dir for dir in os.listdir(outdir) if os.path.isdir(os.path.join(outdir, 
 results_files = [os.path.join(outdir, dir, 'combined_results.pkl') for dir in dirs if os.path.isfile(os.path.join(outdir, dir, 'combined_results.pkl'))]
 results = [pickle.load(open(file, 'rb')) for file in results_files]
 
+compare_fig, compare_ax = plt.subplots(1,1,figsize=(text_width, text_width/1.5))
+
 for key in sorted(results[0]['data'].keys()):
     fig = plt.figure()
+
+    final_mean = []
+    final_sd = []
+    samples = []
+
     for i, result in enumerate(sorted(results, key=lambda x: float(x['name'].split('_')[0]))):
-        plt.plot(result['data'][key]['iterations'], result['data'][key]['mean'], c=pc.colors[i], label=result['name'].replace('_', ' '))
+        plt.plot(result['data'][key]['iterations'], result['data'][key]['mean'], c=colors[i], label=result['name'].replace('_', ' '))
+
+        final_mean.append(result['data'][key]['mean'][-1])
+        final_sd.append(result['data'][key]['mean'][-1])
+        samples.append(int(result['name'].split('_')[0]))
+
+    compare_ax.scatter(samples, final_mean, label=key)
+
     plt.legend()
-    pc.savefig(os.path.join(outdir, f'{args.data}-{key}'), pdf=False, svg=False)
+    savefig(os.path.join(outdir, f'{args.data}-{key}'), pdf=False, svg=False)
+
+compare_ax.legend()
+savefig(os.path.join(outdir, f'finals_comparison'), pdf=False, svg=False)
