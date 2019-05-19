@@ -6,7 +6,7 @@ import pandas as pd
 def mean_std_agg_func(entries):
     mean = np.mean(entries)
     std = np.std(entries)
-    return
+    return f'{mean:.3G} ± {std:.3G}'
 
 df_hyp_search = pickle.load(open('/home/mjhutchinson/Documents/MachineLearning/architecture_search_gpar/output/fits/weight_pruning_hyperprior3-3-output/hypersetting_comparison/results.pkl', 'rb'))
 
@@ -35,7 +35,7 @@ df_full_data_hypsearch = df_hyp_search[df_hyp_search['Validation set small'] == 
 
 df_full_data_hypsearch = df_full_data_hypsearch.fillna(value='None')
 
-df_full_data_hypsearch = df_full_data_hypsearch.pivot_table(values=['Validation loglikelihood'], index=index, columns=['Dataset'], dropna=False)
+df_full_data_hypsearch = df_full_data_hypsearch.pivot_table(values=['Validation loglikelihood'], index=index, columns=['Dataset'], dropna=False, aggfunc=mean_std_agg_func)
 
 tex_full_data_hypsearch = df_full_data_hypsearch.to_latex(float_format='%6.3f',
                              na_rep='None',
@@ -53,7 +53,7 @@ df_low_data_hypsearch = df_hyp_search[df_hyp_search['Validation set small'] == T
 
 df_low_data_hypsearch = df_low_data_hypsearch.fillna(value='None')
 
-df_low_data_hypsearch = df_low_data_hypsearch.pivot_table(values=['Validation loglikelihood'], index=index, columns=['Dataset'], dropna=False)
+df_low_data_hypsearch = df_low_data_hypsearch.pivot_table(values=['Validation loglikelihood'], index=index, columns=['Dataset'], dropna=False, aggfunc=mean_std_agg_func)
 
 tex_low_data_hypsearch = df_low_data_hypsearch.to_latex(float_format='%6.3f',
                              na_rep='None',
@@ -93,7 +93,7 @@ df_full_data_kernal_comp = df_kernal_comp[df_kernal_comp['Validation set small']
 
 df_full_data_kernal_comp = df_full_data_kernal_comp.fillna(value='None')
 
-df_full_data_kernal_comp = df_full_data_kernal_comp.pivot_table(values=['Validation loglikelihood'], index=index, columns=['Dataset'], dropna=False, )
+df_full_data_kernal_comp = df_full_data_kernal_comp.pivot_table(values=['Validation loglikelihood'], index=index, columns=['Dataset'], dropna=False, aggfunc=mean_std_agg_func)
 
 tex_full_data_kernal_comp = df_full_data_kernal_comp.to_latex(float_format='%6.3f',
                              na_rep='None',
@@ -111,7 +111,7 @@ df_low_data_kernal_comp = df_kernal_comp[df_kernal_comp['Validation set small'] 
 
 df_low_data_kernal_comp = df_low_data_kernal_comp.fillna(value='None')
 
-df_low_data_kernal_comp = df_low_data_kernal_comp.pivot_table(values=['Validation loglikelihood'], index=index, columns=['Dataset'], dropna=False)
+df_low_data_kernal_comp = df_low_data_kernal_comp.pivot_table(values=['Validation loglikelihood'], index=index, columns=['Dataset'], dropna=False, aggfunc=mean_std_agg_func)
 
 tex_low_data_kernal_comp = df_low_data_kernal_comp.to_latex(float_format='%6.3f',
                              na_rep='None',

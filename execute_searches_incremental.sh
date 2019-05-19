@@ -13,8 +13,8 @@ seeds=("0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "10" "11" "12" "13" "14" "15" "16
 experiment="weight_pruning_hyperprior3-3-output"
 initial_random_point=3
 thompson_samples=4
-samples_per_thompson=50
-name="50_sample_per_thompson-no_refit"
+samples_per_thompson=3
+name="3_sample_per_thompson-no_refit"
 
 for ds in "${datasets[@]}"; do
 
