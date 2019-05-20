@@ -149,9 +149,9 @@ if acquisition_function is None and not args.random:
 if args.random:
     args.acquisition = "Random"
 
-if args.random and not args.final:
-    print("Cannot have random search with multiple outputs")
-    sys.exit(0)
+# if args.random and not args.final:
+#     print("Cannot have random search with multiple outputs")
+#     sys.exit(0)
 
 # Define location of data and output directories
 data_dir = args.datadir #'/home/mjhutchinson/Documents/MachineLearning/architecture_search_gpar/data/'
@@ -450,14 +450,15 @@ if not args.random:
         iteration += 1
 
 else:
-    while y_tested.shape[0] < args.max_evals:
+    while (y_tested.sum() < (args.max_evals * depth)) and ((~y_tested[:, -1]).sum() >= args.thompson_samples) :
         print(f'Running iteration {iteration}')
+
         available_set = np.arange(y_tested.shape[0])[np.where(~y_tested[:, -1])]
         next_index = np.random.choice(available_set, 1)
 
         # Select the next points to try
         x_next_inds = next_index
-        y_next_inds = tuple([np.ones(depth, dtype=np.int) * next_index, y_tested.sum(axis=1)[next_index]])
+        y_next_inds = tuple([np.ones(depth, dtype=np.int) * next_index, np.arange(depth)])
         # Create a helpful flagged array of the next values
         y_next = np.zeros(y.shape, dtype=np.bool)
         y_next[y_next_inds] = True
@@ -465,15 +466,12 @@ else:
         # 'Test' the selected set of points
         y_tested[y_next_inds] = True
 
-        x_best, y_best = x[y_tested[:, -1].nanargmax()], unnormalise(y_tested[y_tested[:, -1].nanargmax(), -1])
-
-        # update the best points found so far. TODO: Maybe look at making f/x_best the best from the GPAR function, rather than the data point?
         y_temp = y.copy()
         y_temp[~y_tested] = -np.inf
         x_best, y_best = x[y_temp[:, -1].argmax()], y[y_temp[:, -1].argmax(), -1]
 
         iteration_result = IncrementalIterationResults(
-            iteration,
+            -1,
             x.copy(), y.copy(),
             y_tested.copy(),
             y_next.copy(),
@@ -483,6 +481,7 @@ else:
             x_best.copy(),
             y_best.copy()
         )
+        iteration_results.append(iteration_result)
 
         iteration += 1
 
