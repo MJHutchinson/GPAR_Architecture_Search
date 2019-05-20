@@ -309,7 +309,7 @@ if not args.random:
     #                       noise=0.01)
 
     if args.long:
-        threshold = int(y.size * 0.6)
+        threshold = max(int(y.size * 0.6), args.max_evals * depth)
     else:
         threshold = args.max_evals * depth
 
