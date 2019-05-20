@@ -123,15 +123,18 @@ for idx, key in enumerate(experiment_types.keys()):
 
         # ax1.axhline(f_max, label='Maxima value')
 
+        total_points = results[0][0].y_remaining[:, -1].size + results[0][0].y_tested[:, -1].size
+
         # This meaning does not work if the results come at different numbers of points acquired for this search type
-        ax1.plot(iterations[:, 0], np.mean(iteration_results, axis=1), c=colors[idx], label=f'{key[0]} {"final only" if key[1] else "all"}')
-        ax2.plot(iterations[:, 0], np.std(iteration_results, axis=1), c=colors[idx], label=f'{key[0]} {"final only" if key[1] else "all"}')
+        ax1.plot(iterations[:, 0]/total_points, np.mean(iteration_results, axis=1), c=colors[idx], label=f'{key[0]} {"final only" if key[1] else "all"}')
+        ax2.plot(iterations[:, 0]/total_points, np.std(iteration_results, axis=1), c=colors[idx], label=f'{key[0]} {"final only" if key[1] else "all"}')
 
         dump_dict[key] = {
             'iterations': iterations[:, 0],
             'mean': list(np.mean(iteration_results, axis=1)),
             'std': list(np.std(iteration_results, axis=1)),
-            # 'best': f_max
+            # 'best': f_max,
+            'total_points': total_points
         }
 
         # plt.fill_between(iterations[:, 0], np.min(iteration_results, axis=1), np.max(iteration_results, axis=1), color=colors[idx], alpha=0.3)
@@ -182,8 +185,10 @@ for seed in seed_dict.keys():
 
             f_max = max(result.results[-1].y_remaining[:, -1].max(), result.results[-1].y_tested[:, -1].max())
 
+            total_points = result.results[-1].y_remaining[:, -1].size + result.results[-1].y_tested[:, -1].size
+
             plt.axhline(f_max, label='Maxima value')
-            plt.plot(iterations, iteration_results, c=colors[j], label=f'{result.config.acquisition} {"final only" if result.config.final else "all"}')
+            plt.plot(iterations/total_points, iteration_results, c=colors[j], label=f'{result.config.acquisition} {"final only" if result.config.final else "all"}')
 
         plt.legend()
         plotting_config.savefig(outdir + f'/search_results_{seed}')

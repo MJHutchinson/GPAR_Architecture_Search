@@ -306,7 +306,7 @@ if not args.random:
     #                       replace=True,
     #                       noise=0.01)
 
-    while y_tested.sum() < (args.max_evals * depth):
+    while (y_tested.sum() < (args.max_evals * depth)) and ((~y_tested[:, -1]).sum() >= args.thompson_samples) :
 
         model = GPARRegressor(scale=[1., .5], scale_tie=True,
                               linear=True, linear_scale=10., input_linear=False,
@@ -402,6 +402,7 @@ if not args.random:
                 acquisition_value = acquisition_function(dataset_samples, y_best)
                 acquisition_value = acquisition_value[:, -1]
                 completed = y_tested[:, -1]
+
                 # Set acquisition for completed networks to -inf
                 acquisition_value[np.where(completed)] = -np.inf
                 # Select the top next indices to try

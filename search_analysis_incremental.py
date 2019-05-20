@@ -95,6 +95,8 @@ fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True, figsize=plotting_config.full_w
 plt.suptitle(f'Search methods on {args.data} comparison \n Searching for optimal {"RMSE" if args.rmse else "Log Likelihood"}')
 ax1.set_title('Mean best search value found')
 ax2.set_title('Standard deviation of best values found')
+ax2.set_xlabel('Percentage of points in space sampled')
+# ax3.set_title('Percentage of points sampled')
 
 for idx, key in enumerate(experiment_types.keys()):
     results = experiment_types[key]
@@ -116,18 +118,20 @@ for idx, key in enumerate(experiment_types.keys()):
         # print(iterations, iteration_results)
 
         f_max = results[0][0].y[:, -1].max()
+        total_points = results[0][0].y.size
 
         ax1.axhline(f_max, label='Maxima value')
 
         # This meaning does not work if the results come at different numbers of points acquired for this search type
-        ax1.plot(iterations[:, 0], np.mean(iteration_results, axis=1), c=colors[idx], label=f'{key[0]} {"final only" if key[1] else "all"}')
-        ax2.plot(iterations[:, 0], np.std(iteration_results, axis=1), c=colors[idx], label=f'{key[0]} {"final only" if key[1] else "all"}')
+        ax1.plot(iterations[:, 0]/total_points, np.mean(iteration_results, axis=1), c=colors[idx], label=f'{key[0]} {"final only" if key[1] else "all"}')
+        ax2.plot(iterations[:, 0]/total_points, np.std(iteration_results, axis=1), c=colors[idx], label=f'{key[0]} {"final only" if key[1] else "all"}')
 
         dump_dict[key] = {
             'iterations': iterations[:, 0],
             'mean': list(np.mean(iteration_results, axis=1)),
             'std': list(np.std(iteration_results, axis=1)),
-            'best': f_max
+            'best': f_max,
+            'total_points': total_points
         }
 
         # plt.fill_between(iterations[:, 0], np.min(iteration_results, axis=1), np.max(iteration_results, axis=1), color=colors[idx], alpha=0.3)
@@ -160,6 +164,7 @@ for seed in seed_dict.keys():
     if results is not []:
         fig, ax = plt.subplots(1, 1, figsize=plotting_config.full_width_square)
         ax.set_title(f'Seed {seed}')
+        ax.set_xlabel('Percentage of points in space sampled')
 
         for j, result in enumerate(results):
             iteration_results = np.zeros([len(result.results)])
@@ -178,8 +183,10 @@ for seed in seed_dict.keys():
 
             f_max = result.results[-1].y[:, -1].max()
 
+            total_points = result.results[-1].y.size
+
             plt.axhline(f_max, label='Maxima value')
-            plt.plot(iterations, iteration_results, c=colors[j], label=f'{result.config.acquisition} {"final only" if result.config.final else "all"}')
+            plt.plot(iterations/total_points, iteration_results, c=colors[j], label=f'{result.config.acquisition} {"final only" if result.config.final else "all"}')
 
         plt.legend()
         plotting_config.savefig(outdir + f'/search_results_{seed}')

@@ -36,6 +36,15 @@ results = [pickle.load(open(file, 'rb')) for file in results_files]
 
 compare_fig, compare_ax = plt.subplots(1,1,figsize=(text_width, text_width/1.5))
 
+
+def custom_key_sort(input):
+    try:
+        key = float(input['name'].split('_')[0])
+    except ValueError:
+        key = 50
+
+    return key
+
 for key in sorted(results[0]['data'].keys()):
     fig = plt.figure()
 
@@ -43,17 +52,14 @@ for key in sorted(results[0]['data'].keys()):
     final_sd = []
     samples = []
 
-    for i, result in enumerate(sorted(results, key=lambda x: float(x['name'].split('_')[0]))):
+    for i, result in enumerate(sorted(results, key=lambda x: custom_key_sort(x))):
         plt.plot(result['data'][key]['iterations'], result['data'][key]['mean'], c=colors[i], label=result['name'].replace('_', ' '))
 
         final_mean.append(result['data'][key]['mean'][-1])
         final_sd.append(result['data'][key]['mean'][-1])
-        samples.append(int(result['name'].split('_')[0]))
+        samples.append(result['name'].split('_')[0])
 
     compare_ax.scatter(samples, final_mean, label=key)
 
     plt.legend()
     savefig(os.path.join(outdir, f'{args.data}-{key}'), pdf=False, svg=False)
-
-compare_ax.legend()
-savefig(os.path.join(outdir, f'finals_comparison'), pdf=False, svg=False)
