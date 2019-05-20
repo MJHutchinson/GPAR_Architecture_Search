@@ -101,9 +101,14 @@ ax2.set_xlabel('Percentage of points in space sampled')
 for idx, key in enumerate(experiment_types.keys()):
     results = experiment_types[key]
     if results is not []:
-        iteration_results = np.zeros([len(results[0]), len(results)])
-        iterations = np.zeros([len(results[0]), len(results)])
-        for i in range(len(results[0])):
+
+        lens = [len(results[i]) for i in range(len(results))]
+        min_len = min(lens)
+
+        iteration_results = np.zeros([min_len, len(results)])
+        iterations = np.zeros([min_len, len(results)])
+
+        for i in range(min_len):
             for j in range(len(results)):
                 iteration_result = np.squeeze(results[j][i].y_best)
                 if len(iteration_result.shape) == 2:

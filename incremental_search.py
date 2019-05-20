@@ -123,6 +123,8 @@ parser.add_argument('--name', type=str, required=True, help='Name to give the ex
 parser.add_argument('--synthetic_scales', nargs=2, type=float, metavar=('Depth Scale', 'Width Scale'),
                     help='2 argument list to determine the length scales of the generator function', default=[2., 0.5])
 
+parser.add_argument('--long', action='store_true', help='rather than obey the number limit, run until at least 80% of points have been sampled')
+
 
 args = parser.parse_args()
 
@@ -211,7 +213,7 @@ depth = y.shape[1]
 
 num_function_samples = max(50, args.thompson_samples * args.samples_per_thompson)
 
-outdir = os.path.join(args.outdir, 'searches', args.experiment + '_incremental', args.data, args.name,
+outdir = os.path.join(args.outdir, 'searches', args.experiment + f'{"_incremental" if not args.final else ""}' + f'{"_long" if args.long else ""}' , args.data, args.name,
                       f'{"rmse" if args.rmse else "loglik"}-{"random" if args.random else args.acquisition}-{"final" if args.final else "all"}-{args.seed}')
 args.outdir = outdir
 
@@ -306,7 +308,12 @@ if not args.random:
     #                       replace=True,
     #                       noise=0.01)
 
-    while (y_tested.sum() < (args.max_evals * depth)) and ((~y_tested[:, -1]).sum() >= args.thompson_samples) :
+    if args.long:
+        threshold = int(y.size * 0.6)
+    else:
+        threshold = args.max_evals * depth
+
+    while (y_tested.sum() < threshold) and ((~y_tested[:, -1]).sum() >= args.thompson_samples) :
 
         model = GPARRegressor(scale=[1., .5], scale_tie=True,
                               linear=True, linear_scale=10., input_linear=False,
