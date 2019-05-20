@@ -81,49 +81,49 @@ for seed in "${seeds[@]}"; do
     #
         for ds in "${datasets[@]}"; do
 
-        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --seed "$seed" --data "$ds" --subexperiment hypersetting_comparison --output_linear --output_nonlinear                     --markov 3
-        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --seed "$seed" --data "$ds" --subexperiment hypersetting_comparison --output_linear --output_nonlinear --joint             --markov 3
-        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --seed "$seed" --data "$ds" --subexperiment hypersetting_comparison --output_linear --output_nonlinear         --scale_tie --markov 3
-        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --seed "$seed" --data "$ds" --subexperiment hypersetting_comparison --output_linear --output_nonlinear --joint --scale_tie --markov 3
-        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --seed "$seed" --data "$ds" --subexperiment hypersetting_comparison --output_linear --output_nonlinear                     --markov 1
-        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --seed "$seed" --data "$ds" --subexperiment hypersetting_comparison --output_linear --output_nonlinear --joint             --markov 1
-        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --seed "$seed" --data "$ds" --subexperiment hypersetting_comparison --output_linear --output_nonlinear         --scale_tie --markov 1
-        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --seed "$seed" --data "$ds" --subexperiment hypersetting_comparison --output_linear --output_nonlinear --joint --scale_tie --markov 1
-        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --seed "$seed" --data "$ds" --subexperiment hypersetting_comparison --output_linear --output_nonlinear                     --markov 0
-        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --seed "$seed" --data "$ds" --subexperiment hypersetting_comparison --output_linear --output_nonlinear --joint             --markov 0
-        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --seed "$seed" --data "$ds" --subexperiment hypersetting_comparison --output_linear --output_nonlinear         --scale_tie --markov 0seed
-        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --seed "$seed" --data "$ds" --subexperiment hypersetting_comparison --output_linear --output_nonlinear --joint --scale_tie --markov 0
+#        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --seed "$seed" --data "$ds" --subexperiment hypersetting_comparison --output_linear --output_nonlinear                     --markov 3
+#        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --seed "$seed" --data "$ds" --subexperiment hypersetting_comparison --output_linear --output_nonlinear --joint             --markov 3
+#        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --seed "$seed" --data "$ds" --subexperiment hypersetting_comparison --output_linear --output_nonlinear         --scale_tie --markov 3
+#        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --seed "$seed" --data "$ds" --subexperiment hypersetting_comparison --output_linear --output_nonlinear --joint --scale_tie --markov 3
+#        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --seed "$seed" --data "$ds" --subexperiment hypersetting_comparison --output_linear --output_nonlinear                     --markov 1
+#        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --seed "$seed" --data "$ds" --subexperiment hypersetting_comparison --output_linear --output_nonlinear --joint             --markov 1
+#        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --seed "$seed" --data "$ds" --subexperiment hypersetting_comparison --output_linear --output_nonlinear         --scale_tie --markov 1
+#        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --seed "$seed" --data "$ds" --subexperiment hypersetting_comparison --output_linear --output_nonlinear --joint --scale_tie --markov 1
+#        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --seed "$seed" --data "$ds" --subexperiment hypersetting_comparison --output_linear --output_nonlinear                     --markov 0
+#        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --seed "$seed" --data "$ds" --subexperiment hypersetting_comparison --output_linear --output_nonlinear --joint             --markov 0
+        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --seed "$seed" --data "$ds" --subexperiment hypersetting_comparison --output_linear --output_nonlinear         --scale_tie --markov 0
+#        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --seed "$seed" --data "$ds" --subexperiment hypersetting_comparison --output_linear --output_nonlinear --joint --scale_tie --markov 0
 
-        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --seed "$seed" --data "$ds" --subexperiment hypersetting_comparison --validsmall --output_linear --output_nonlinear                     --markov 3
-        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --seed "$seed" --data "$ds" --subexperiment hypersetting_comparison --validsmall --output_linear --output_nonlinear --joint             --markov 3
-        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --seed "$seed" --data "$ds" --subexperiment hypersetting_comparison --validsmall --output_linear --output_nonlinear         --scale_tie --markov 3
-        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --seed "$seed" --data "$ds" --subexperiment hypersetting_comparison --validsmall --output_linear --output_nonlinear --joint --scale_tie --markov 3
-        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --seed "$seed" --data "$ds" --subexperiment hypersetting_comparison --validsmall --output_linear --output_nonlinear                     --markov 1
-        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --seed "$seed" --data "$ds" --subexperiment hypersetting_comparison --validsmall --output_linear --output_nonlinear --joint             --markov 1
-        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --seed "$seed" --data "$ds" --subexperiment hypersetting_comparison --validsmall --output_linear --output_nonlinear         --scale_tie --markov 1
-        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --seed "$seed" --data "$ds" --subexperiment hypersetting_comparison --validsmall --output_linear --output_nonlinear --joint --scale_tie --markov 1
-        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --seed "$seed" --data "$ds" --subexperiment hypersetting_comparison --validsmall --output_linear --output_nonlinear                     --markov 0
-        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --seed "$seed" --data "$ds" --subexperiment hypersetting_comparison --validsmall --output_linear --output_nonlinear --joint             --markov 0
-        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --seed "$seed" --data "$ds" --subexperiment hypersetting_comparison --validsmall --output_linear --output_nonlinear         --scale_tie --markov 0
-        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --seed "$seed" --data "$ds" --subexperiment hypersetting_comparison --validsmall --output_linear --output_nonlinear --joint --scale_tie --markov 0
+#        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --seed "$seed" --data "$ds" --subexperiment hypersetting_comparison --validsmall --output_linear --output_nonlinear                     --markov 3
+#        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --seed "$seed" --data "$ds" --subexperiment hypersetting_comparison --validsmall --output_linear --output_nonlinear --joint             --markov 3
+#        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --seed "$seed" --data "$ds" --subexperiment hypersetting_comparison --validsmall --output_linear --output_nonlinear         --scale_tie --markov 3
+#        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --seed "$seed" --data "$ds" --subexperiment hypersetting_comparison --validsmall --output_linear --output_nonlinear --joint --scale_tie --markov 3
+#        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --seed "$seed" --data "$ds" --subexperiment hypersetting_comparison --validsmall --output_linear --output_nonlinear                     --markov 1
+#        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --seed "$seed" --data "$ds" --subexperiment hypersetting_comparison --validsmall --output_linear --output_nonlinear --joint             --markov 1
+#        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --seed "$seed" --data "$ds" --subexperiment hypersetting_comparison --validsmall --output_linear --output_nonlinear         --scale_tie --markov 1
+#        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --seed "$seed" --data "$ds" --subexperiment hypersetting_comparison --validsmall --output_linear --output_nonlinear --joint --scale_tie --markov 1
+#        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --seed "$seed" --data "$ds" --subexperiment hypersetting_comparison --validsmall --output_linear --output_nonlinear                     --markov 0
+#        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --seed "$seed" --data "$ds" --subexperiment hypersetting_comparison --validsmall --output_linear --output_nonlinear --joint             --markov 0
+#        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --seed "$seed" --data "$ds" --subexperiment hypersetting_comparison --validsmall --output_linear --output_nonlinear         --scale_tie --markov 0
+#        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --seed "$seed" --data "$ds" --subexperiment hypersetting_comparison --validsmall --output_linear --output_nonlinear --joint --scale_tie --markov 0
 
-        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --data "$ds" --seed "$seed" --markov 1 --joint --subexperiment kernal_comparison
-        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --data "$ds" --seed "$seed" --markov 1 --joint --subexperiment kernal_comparison --input_linear
-        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --data "$ds" --seed "$seed" --markov 1 --joint --subexperiment kernal_comparison                --output_linear
-        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --data "$ds" --seed "$seed" --markov 1 --joint --subexperiment kernal_comparison --input_linear --output_linear
-        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --data "$ds" --seed "$seed" --markov 1 --joint --subexperiment kernal_comparison                --output_linear --output_nonlinear
-        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --data "$ds" --seed "$seed" --markov 1 --joint --subexperiment kernal_comparison --input_linear --output_linear --output_nonlinear
-        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --data "$ds" --seed "$seed" --markov 1 --joint --subexperiment kernal_comparison                                --output_nonlinear
-        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --data "$ds" --seed "$seed" --markov 1 --joint --subexperiment kernal_comparison --input_linear                 --output_nonlinear
-
-        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --data "$ds" --seed "$seed" --markov 1 --joint --subexperiment kernal_comparison --validsmall
-        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --data "$ds" --seed "$seed" --markov 1 --joint --subexperiment kernal_comparison --validsmall --input_linear
-        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --data "$ds" --seed "$seed" --markov 1 --joint --subexperiment kernal_comparison --validsmall                --output_linear
-        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --data "$ds" --seed "$seed" --markov 1 --joint --subexperiment kernal_comparison --validsmall --input_linear --output_linear
-        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --data "$ds" --seed "$seed" --markov 1 --joint --subexperiment kernal_comparison --validsmall                --output_linear --output_nonlinear
-        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --data "$ds" --seed "$seed" --markov 1 --joint --subexperiment kernal_comparison --validsmall --input_linear --output_linear --output_nonlinear
-        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --data "$ds" --seed "$seed" --markov 1 --joint --subexperiment kernal_comparison --validsmall                                --output_nonlinear
-        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --data "$ds" --seed "$seed" --markov 1 --joint --subexperiment kernal_comparison --validsmall --input_linear                 --output_nonlinear
+#        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --data "$ds" --seed "$seed" --markov 1 --joint --subexperiment kernal_comparison
+#        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --data "$ds" --seed "$seed" --markov 1 --joint --subexperiment kernal_comparison --input_linear
+#        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --data "$ds" --seed "$seed" --markov 1 --joint --subexperiment kernal_comparison                --output_linear
+#        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --data "$ds" --seed "$seed" --markov 1 --joint --subexperiment kernal_comparison --input_linear --output_linear
+#        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --data "$ds" --seed "$seed" --markov 1 --joint --subexperiment kernal_comparison                --output_linear --output_nonlinear
+#        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --data "$ds" --seed "$seed" --markov 1 --joint --subexperiment kernal_comparison --input_linear --output_linear --output_nonlinear
+#        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --data "$ds" --seed "$seed" --markov 1 --joint --subexperiment kernal_comparison                                --output_nonlinear
+#        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --data "$ds" --seed "$seed" --markov 1 --joint --subexperiment kernal_comparison --input_linear                 --output_nonlinear
+#
+#        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --data "$ds" --seed "$seed" --markov 1 --joint --subexperiment kernal_comparison --validsmall
+#        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --data "$ds" --seed "$seed" --markov 1 --joint --subexperiment kernal_comparison --validsmall --input_linear
+#        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --data "$ds" --seed "$seed" --markov 1 --joint --subexperiment kernal_comparison --validsmall                --output_linear
+#        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --data "$ds" --seed "$seed" --markov 1 --joint --subexperiment kernal_comparison --validsmall --input_linear --output_linear
+#        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --data "$ds" --seed "$seed" --markov 1 --joint --subexperiment kernal_comparison --validsmall                --output_linear --output_nonlinear
+#        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --data "$ds" --seed "$seed" --markov 1 --joint --subexperiment kernal_comparison --validsmall --input_linear --output_linear --output_nonlinear
+#        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --data "$ds" --seed "$seed" --markov 1 --joint --subexperiment kernal_comparison --validsmall                                --output_nonlinear
+#        python fit_gpar.py --experiment weight_pruning_hyperprior3-3-output --data "$ds" --seed "$seed" --markov 1 --joint --subexperiment kernal_comparison --validsmall --input_linear                 --output_nonlinear
 
     done
 done

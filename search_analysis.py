@@ -119,6 +119,10 @@ for idx, key in enumerate(experiment_types.keys()):
 
         # print(iterations, iteration_results)
 
+        # f_max = max(results[0][0].y_remaining[:, -1].max(), results[0][0].y_tested[:, -1].max())
+
+        # ax1.axhline(f_max, label='Maxima value')
+
         # This meaning does not work if the results come at different numbers of points acquired for this search type
         ax1.plot(iterations[:, 0], np.mean(iteration_results, axis=1), c=colors[idx], label=f'{key[0]} {"final only" if key[1] else "all"}')
         ax2.plot(iterations[:, 0], np.std(iteration_results, axis=1), c=colors[idx], label=f'{key[0]} {"final only" if key[1] else "all"}')
@@ -126,7 +130,8 @@ for idx, key in enumerate(experiment_types.keys()):
         dump_dict[key] = {
             'iterations': iterations[:, 0],
             'mean': list(np.mean(iteration_results, axis=1)),
-            'std': list(np.std(iteration_results, axis=1))
+            'std': list(np.std(iteration_results, axis=1)),
+            # 'best': f_max
         }
 
         # plt.fill_between(iterations[:, 0], np.min(iteration_results, axis=1), np.max(iteration_results, axis=1), color=colors[idx], alpha=0.3)
@@ -175,6 +180,9 @@ for seed in seed_dict.keys():
 
                 iterations[i] = result.results[i].y_tested.shape[0]
 
+            f_max = max(result.results[-1].y_remaining[:, -1].max(), result.results[-1].y_tested[:, -1].max())
+
+            plt.axhline(f_max, label='Maxima value')
             plt.plot(iterations, iteration_results, c=colors[j], label=f'{result.config.acquisition} {"final only" if result.config.final else "all"}')
 
         plt.legend()

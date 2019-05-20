@@ -383,7 +383,7 @@ if not args.random:
         y_tested = np.concatenate([y_tested, y_next], axis=0)
 
         # update the best points found so far. TODO: Maybe look at making f/x_best the best from the GPAR function, rather than the data point?
-        x_best, y_best = x_tested[y_tested[:, -1].argmax()], unnormalise(y_tested[y_tested[:, -1].argmax(), -1])
+        x_best, y_best = x_tested[y_tested[:, -1].argmax()], y_tested[y_tested[:, -1].argmax(), -1]
 
         iteration += 1
 

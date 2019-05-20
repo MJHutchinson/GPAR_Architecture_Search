@@ -211,7 +211,7 @@ depth = y.shape[1]
 
 num_function_samples = max(50, args.thompson_samples * args.samples_per_thompson)
 
-outdir = os.path.join(args.outdir, 'searches', args.experiment, args.data, args.name,
+outdir = os.path.join(args.outdir, 'searches', args.experiment + '_incremental', args.data, args.name,
                       f'{"rmse" if args.rmse else "loglik"}-{"random" if args.random else args.acquisition}-{"final" if args.final else "all"}-{args.seed}')
 args.outdir = outdir
 
