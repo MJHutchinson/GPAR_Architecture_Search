@@ -457,7 +457,13 @@ if not args.random:
         iteration += 1
 
 else:
-    while (y_tested.sum() < (args.max_evals * depth)) and ((~y_tested[:, -1]).sum() >= args.thompson_samples) :
+
+    if args.long:
+        threshold = max(int(y.size * 0.6), args.max_evals * depth)
+    else:
+        threshold = args.max_evals * depth
+
+    while (y_tested.sum() < threshold) and ((~y_tested[:, -1]).sum() >= args.thompson_samples) :
         print(f'Running iteration {iteration}')
 
         available_set = np.arange(y_tested.shape[0])[np.where(~y_tested[:, -1])]

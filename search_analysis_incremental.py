@@ -50,6 +50,8 @@ parser.add_argument('-f', '--full', action='store_true',
 parser.add_argument('--outdir', type=str, help='Directory to get output from',
                     default='output')
 
+parser.add_argument('--experiment_extra', type=str, help='identifier added to end of experiment name')
+
 args = parser.parse_args()
 
 print(args)
@@ -59,7 +61,7 @@ outdir = os.path.join(args.outdir, 'searches', args.experiment, args.data, args.
 dirs = [dir for dir in os.listdir(outdir) if os.path.isdir(os.path.join(outdir, dir))]
 
 def match(file_args):
-    if not args.experiment == file_args.experiment+'_incremental':
+    if not args.experiment == file_args.experiment+args.experiment_extra:
         return False
     if not args.data == file_args.data:
         return False
