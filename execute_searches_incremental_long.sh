@@ -26,9 +26,9 @@ for index in in ${!names[*]}; do
         for seed in "${seeds[@]}"; do
                 echo incremental_search.py --long --name "$name"  --data "$ds" --experiment "$experiment" --seed "$seed" --thompson_samples "$thompson_samples" --samples_per_thompson "$samples_per_thompson" --random --datadir "$DATADIR" --outdir "$OUTDIR"
 
-#            for acquisition in "${acquisitions[@]}"; do
-#                python incremental_search.py --long --name "$name" --data "$ds" --experiment "$experiment" --seed "$seed" --thompson_samples "$thompson_samples" --samples_per_thompson "$samples_per_thompson" --acquisition "$acquisition" --datadir "$DATADIR" --outdir "$OUTDIR"
-    #            python dummy_search.py --data "$ds" --experiment "$experiment" --function_seed "$function_seed" --noise 0.02 --seed "$seed" --thompson_samples "$thompson_samples" --acquisition "$acquisition" --datadir "$DATADIR" --outdir "$OUTDIR"
+            for acquisition in "${acquisitions[@]}"; do
+                python incremental_search.py --long --name "$name" --data "$ds" --experiment "$experiment" --seed "$seed" --thompson_samples "$thompson_samples" --samples_per_thompson "$samples_per_thompson" --acquisition "$acquisition" --datadir "$DATADIR" --outdir "$OUTDIR"
+#                python dummy_search.py --data "$ds" --experiment "$experiment" --function_seed "$function_seed" --noise 0.02 --seed "$seed" --thompson_samples "$thompson_samples" --acquisition "$acquisition" --datadir "$DATADIR" --outdir "$OUTDIR"
             done
         done
     done
