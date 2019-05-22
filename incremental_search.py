@@ -211,7 +211,10 @@ if args.final:
 
 depth = y.shape[1]
 
-num_function_samples = max(50, args.thompson_samples * args.samples_per_thompson)
+if args.samples_per_thompson:
+    num_function_samples = args.thompson_samples * args.samples_per_thompson
+else:
+    num_function_samples = 50
 
 outdir = os.path.join(args.outdir, 'searches', args.experiment + f'{"_incremental" if not args.final else ""}' + f'{"_long" if args.long else ""}' , args.data, args.name,
                       f'{"rmse" if args.rmse else "loglik"}-{"random" if args.random else args.acquisition}-{"final" if args.final else "all"}-{args.seed}')
@@ -344,7 +347,7 @@ if not args.random:
         # Sample the test points to allow us to plot the form of the GPAR function
         print('\t Predicting test points')
         test_samples = unnormalise(model.sample(transform_x(x_test),
-                                                num_samples=num_function_samples,
+                                                num_samples=50,
                                                 latent=True,
                                                 posterior=True))
         print('Computing test stats')

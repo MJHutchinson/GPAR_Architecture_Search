@@ -7,7 +7,7 @@ import numpy as np
 from tqdm import tqdm
 
 import plotting
-import plotting_config as plotting_config
+from plotting_config import *
 
 IncrementalIterationResults = namedtuple('IncrementalIterationResults',
                               [
@@ -93,10 +93,9 @@ for experiment in experiments:
 
 colors = ['tab:blue', 'tab:orange', 'tab:green', 'tab:red', 'tab:purple', 'tab:brown', 'tab:pink', 'tab:gray', 'tab:olive', 'tab:cyan']
 
-fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True, figsize=plotting_config.full_width_square)
-plt.suptitle(f'Search methods on {args.data} comparison \n Searching for optimal {"RMSE" if args.rmse else "Log Likelihood"}')
-ax1.set_title('Mean best search value found')
-ax2.set_title('Standard deviation of best values found')
+fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True, figsize=(text_width, text_height/2.1))
+ax1.set_ylabel('Mean best search \n value found')
+ax2.set_ylabel('Standard deviation \n of best values found')
 ax2.set_xlabel('Percentage of points in space sampled')
 # ax3.set_title('Percentage of points sampled')
 
@@ -155,7 +154,7 @@ for idx, key in enumerate(experiment_types.keys()):
         #                  color=colors[idx], alpha=0.2)
 
 plt.legend()
-plotting_config.savefig(outdir + '/search_results')
+savefig(outdir + '/search_results')
 plt.close()
 
 pickle.dump({'name': args.name, 'data': dump_dict}, open(os.path.join(outdir, 'combined_results.pkl'), 'wb'))
@@ -169,7 +168,7 @@ for seed in seed_dict.keys():
     results = seed_dict[seed]
 
     if results is not []:
-        fig, ax = plt.subplots(1, 1, figsize=plotting_config.full_width_square)
+        fig, ax = plt.subplots(1, 1, figsize=(text_width, text_height/2.1))
         ax.set_title(f'Seed {seed}')
         ax.set_xlabel('Percentage of points in space sampled')
 
@@ -196,7 +195,7 @@ for seed in seed_dict.keys():
             plt.plot(iterations/total_points, iteration_results, c=colors[j], label=f'{result.config.acquisition} {"final only" if result.config.final else "all"}')
 
         plt.legend()
-        plotting_config.savefig(outdir + f'/search_results_{seed}')
+        savefig(outdir + f'/search_results_{seed}')
         plt.close()
 
 
