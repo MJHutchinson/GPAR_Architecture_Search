@@ -6,9 +6,7 @@ source venv/bin/activate
 
 #datasets=("wine-quality-red" "yacht")
 #datasets=("kin8nm" "wine" "yacht")
-#datasets=("power-plant" "bostonHousing" "concrete" "energy" "kin8nm" "wine-quality-red" "yacht")
-datasets=("protein-tertiary-structure" "yacht")
-
+datasets=("power-plant" "bostonHousing" "concrete" "energy" "kin8nm" "wine-quality-red" "yacht")
 #datasets=("synthetic")
 acquisitions=("EI" "PI" "SD")
 seeds=("0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "10" "11" "12" "13" "14" "15" "16")
@@ -26,10 +24,10 @@ for index in in ${!names[*]}; do
     name="${names[$index]}"
     for ds in "${datasets[@]}"; do
         for seed in "${seeds[@]}"; do
-                python incremental_search.py --long --name "$name"  --data "$ds" --experiment "$experiment" --seed "$seed" --thompson_samples "$thompson_samples" --samples_per_thompson "$samples_per_thompson" --random --datadir "$DATADIR" --outdir "$OUTDIR"
+                python incremental_search.py --final --long --name "$name"  --data "$ds" --experiment "$experiment" --seed "$seed" --thompson_samples "$thompson_samples" --samples_per_thompson "$samples_per_thompson" --random --datadir "$DATADIR" --outdir "$OUTDIR"
 
             for acquisition in "${acquisitions[@]}"; do
-                python incremental_search.py --long --name "$name" --data "$ds" --experiment "$experiment" --seed "$seed" --thompson_samples "$thompson_samples" --samples_per_thompson "$samples_per_thompson" --acquisition "$acquisition" --datadir "$DATADIR" --outdir "$OUTDIR"
+                python incremental_search.py --final --long --name "$name" --data "$ds" --experiment "$experiment" --seed "$seed" --thompson_samples "$thompson_samples" --samples_per_thompson "$samples_per_thompson" --acquisition "$acquisition" --datadir "$DATADIR" --outdir "$OUTDIR"
 #                python dummy_search.py --data "$ds" --experiment "$experiment" --function_seed "$function_seed" --noise 0.02 --seed "$seed" --thompson_samples "$thompson_samples" --acquisition "$acquisition" --datadir "$DATADIR" --outdir "$OUTDIR"
             done
         done

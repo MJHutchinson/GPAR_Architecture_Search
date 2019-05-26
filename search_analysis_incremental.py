@@ -8,6 +8,9 @@ from tqdm import tqdm
 
 import plotting
 from plotting_config import *
+import plotting_config
+
+final_thesis_dir = '/home/mjhutchinson/Documents/University/4th Year/4th Year Project/Final Thesis/Thesis-LaTeX/Chapter5/Figs'
 
 IncrementalIterationResults = namedtuple('IncrementalIterationResults',
                               [
@@ -120,22 +123,33 @@ for idx, key in enumerate(experiment_types.keys()):
                     iteration_results[i, j] = iteration_result
 
                 iterations[i, j] = results[j][i].y_tested_flags.sum()
+                # iterations[i, j] = (results[j][i].y_tested_flags * np.array([1000,3000,26000])).sum()
 
         # print(iterations, iteration_results)
 
         f_max = results[0][0].y[:, -1].max()
         total_points = results[0][0].y.size
+        # total_points = results[0][0].y.size * 10000
 
         ax1.axhline(f_max, label='Maxima value')
 
+        mean = np.mean(iteration_results, axis=1)
+        std = np.std(iteration_results, axis=1)
+
+        mean_std = std / np.sqrt(iteration_results.shape[0])
+
         # This meaning does not work if the results come at different numbers of points acquired for this search type
-        ax1.plot(iterations[:, 0]/total_points, np.mean(iteration_results, axis=1), c=colors[idx], label=f'{key[0]} {"final only" if key[1] else "all"}')
-        ax2.plot(iterations[:, 0]/total_points, np.std(iteration_results, axis=1), c=colors[idx], label=f'{key[0]} {"final only" if key[1] else "all"}')
+        ax1.plot(iterations[:, 0]/total_points, mean, c=colors[idx], label=f'{key[0]} {"final only" if key[1] else "all"}')
+        ax1.fill_between(iterations[:, 0]/total_points, mean + mean_std, mean - mean_std, color=colors[idx], alpha=0.3)
+
+
+        ax2.plot(iterations[:, 0]/total_points, std, c=colors[idx], label=f'{key[0]} {"final only" if key[1] else "all"}')
 
         dump_dict[key] = {
             'iterations': iterations[:, 0],
-            'mean': list(np.mean(iteration_results, axis=1)),
-            'std': list(np.std(iteration_results, axis=1)),
+            'mean': mean,
+            'mean_std': mean_std,
+            'std': std,
             'best': f_max,
             'total_points': total_points
         }
@@ -155,6 +169,7 @@ for idx, key in enumerate(experiment_types.keys()):
 
 plt.legend()
 savefig(outdir + '/search_results')
+savefig(os.path.join(final_thesis_dir, args.data, 'search_comparison' + args.experiment_extra), png=False, pdf=True)
 plt.close()
 
 pickle.dump({'name': args.name, 'data': dump_dict}, open(os.path.join(outdir, 'combined_results.pkl'), 'wb'))
