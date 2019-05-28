@@ -13,10 +13,9 @@ experiment="incremental_synthetic_3_output"
 initial_random_point=5
 thompson_samples=4
 samples_per_thompson=0
-#names=("50_sample_per_thompson-no_refit" "10_sample_per_thompson-no_refit" "3_sample_per_thompson-no_refit")
-#samples_per_thompsons=(0 10 3)
-names=("3_sample_per_thompson-no_refit")
-samples_per_thompsons=(3)
+names=("50_sample_per_thompson-no_refit" "10_sample_per_thompson-no_refit" "3_sample_per_thompson-no_refit")
+samples_per_thompsons=(0 10 3)
+#nameles_per_thompsons=(3)
 synthetic_scales="2. 0.5"
 
 
