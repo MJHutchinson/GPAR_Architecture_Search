@@ -21,7 +21,7 @@ synthetic_scales="2. 0.5"
 
 
 for function_seed in "${function_seeds[@]}"; do
-    for index in in ${!names[*]}; do
+    for index in ${!names[*]}; do
         samples_per_thompson="${samples_per_thompsons[$index]}"
         name="${names[$index]}"
 
