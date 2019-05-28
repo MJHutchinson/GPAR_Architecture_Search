@@ -164,7 +164,7 @@ def transform_x(x):
 
 
 if args.data == 'synthetic':
-    args.data = 'synthetic_' + args.function_seed
+    args.data = 'synthetic_' + str(args.function_seed)
 
     np.random.seed(args.function_seed)
     torch.manual_seed(args.function_seed)
