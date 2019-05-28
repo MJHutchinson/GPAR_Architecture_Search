@@ -15,6 +15,8 @@ thompson_samples=4
 samples_per_thompson=0
 names=("50_sample_per_thompson-no_refit" "10_sample_per_thompson-no_refit" "3_sample_per_thompson-no_refit")
 samples_per_thompsons=(0 10 3)
+#names=("3_sample_per_thompson-no_refit")
+#samples_per_thompsons=(3)
 synthetic_scales="2. 0.5"
 
 for index in in ${!names[*]}; do
@@ -24,10 +26,10 @@ for index in in ${!names[*]}; do
     for ds in "${datasets[@]}"; do
 
         for seed in "${seeds[@]}"; do
-                python incremental_search.py --long --name "$name"  --data "$ds" --experiment "$experiment" --function_seed "$function_seed" --noise 0.01 --seed "$seed" --thompson_samples "$thompson_samples" --samples_per_thompson "$samples_per_thompson" --random --datadir "$DATADIR" --outdir "$OUTDIR"
+                python incremental_search.py --long --final --name "$name"  --data "$ds" --experiment "$experiment" --function_seed "$function_seed" --noise 0.01 --seed "$seed" --thompson_samples "$thompson_samples" --samples_per_thompson "$samples_per_thompson" --random --datadir "$DATADIR" --outdir "$OUTDIR"
 
             for acquisition in "${acquisitions[@]}"; do
-                python incremental_search.py --long --name "$name" --data "$ds" --experiment "$experiment" --function_seed "$function_seed" --noise 0.01 --seed "$seed" --thompson_samples "$thompson_samples" --samples_per_thompson "$samples_per_thompson" --acquisition "$acquisition" --datadir "$DATADIR" --outdir "$OUTDIR"
+                python incremental_search.py --long --final --name "$name" --data "$ds" --experiment "$experiment" --function_seed "$function_seed" --noise 0.01 --seed "$seed" --thompson_samples "$thompson_samples" --samples_per_thompson "$samples_per_thompson" --acquisition "$acquisition" --datadir "$DATADIR" --outdir "$OUTDIR"
     #            python dummy_search.py --data "$ds" --experiment "$experiment" --function_seed "$function_seed" --noise 0.02 --seed "$seed" --thompson_samples "$thompson_samples" --acquisition "$acquisition" --datadir "$DATADIR" --outdir "$OUTDIR"
             done
         done

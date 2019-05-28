@@ -5,8 +5,8 @@ source venv/bin/activate
 . sys.config
 
 #datasets=("wine-quality-red" "yacht")
-#datasets=("kin8nm" "wine" "yacht")
-datasets=("power-plant" "bostonHousing" "concrete" "energy" "kin8nm" "wine-quality-red" "yacht")
+datasets=("protein-tertiary-structure")
+#datasets=("power-plant" "bostonHousing" "concrete" "energy" "kin8nm" "wine-quality-red" "yacht")
 #datasets=("synthetic")
 acquisitions=("EI" "PI" "SD")
 seeds=("0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "10" "11" "12" "13" "14" "15" "16")
